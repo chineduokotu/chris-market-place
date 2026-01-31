@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './context/AuthContext'
 import { ChatProvider } from './context/ChatContext'
@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ChatProvider>
@@ -26,7 +26,7 @@ createRoot(document.getElementById('root')).render(
           </ChatProvider>
         </AuthProvider>
       </QueryClientProvider>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )
 
