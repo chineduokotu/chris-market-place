@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams , Link } from 'react-router-dom';
 import api from '../api/client';
 import ServiceCard from '../components/ServiceCard';
 import { Search, Grid3X3, LayoutList, SlidersHorizontal } from 'lucide-react';
@@ -157,9 +157,9 @@ export default function ServiceList() {
           ) : (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100 max-w-3xl">
               {servicesData?.data?.map((service) => (
-                <a 
+                <Link
                   key={service.id} 
-                  href={`/services/${service.id}`}
+                  to={`/services/${service.id}`}
                   className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors group"
                 >
                   {/* Service Image Thumbnail */}
@@ -196,7 +196,7 @@ export default function ServiceList() {
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )

@@ -1,9 +1,9 @@
 import axios from 'axios';
-const prod_url="https://chris-market-place-server.onrender.com";
-//const dev_url="http://localhost:8000";
+//const prod_url="https://chris-market-place-server.onrender.com";
+const dev_url="http://localhost:8000";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || prod_url + '/api',
+  baseURL: import.meta.env.VITE_API_URL || dev_url + '/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
