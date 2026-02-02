@@ -39,7 +39,7 @@ export default function Home() {
               Find the perfect <span className="text-blue-600">professional</span> for any task.
             </h1>
             <p className="text-xl text-slate-600 leading-relaxed mb-10 max-w-2xl">
-              Connect with thousands of vetted experts, manage projects seamlessly, and get things done faster with ServiceHub.
+              Connect with thousands of vetted experts, manage projects seamlessly, and get things done faster with ChrisHub.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link

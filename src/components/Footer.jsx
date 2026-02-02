@@ -12,10 +12,10 @@ export default function Footer() {
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
-                S
+                C
               </div>
               <span className="text-xl font-bold tracking-tight text-white">
-                Service<span className="text-blue-400">Hub</span>
+                Chris<span className="text-blue-400">Hub</span>
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-slate-400">
@@ -64,13 +64,13 @@ export default function Footer() {
             </div>
             <div className="flex items-center gap-3 text-sm">
               <Mail size={18} className="text-blue-400 shrink-0" />
-              <span>support@servicehub.com</span>
+              <span>support@chrishub.com</span>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <p>© {currentYear} ServiceHub Inc. All rights reserved.</p>
+          <p>© {currentYear} ChrisHub Inc. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-slate-300">Privacy</a>
             <a href="#" className="hover:text-slate-300">Terms</a>

@@ -8,10 +8,10 @@ export default function HowItWorks() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
-            How <span className="text-blue-600">ServiceHub</span> Works
+            How <span className="text-blue-600">ChrisHub</span> Works
           </h1>
           <p className="text-lg text-slate-600 leading-relaxed mb-10">
-            Whether you need a job done or want to offer your skills, ServiceHub makes it secure and simple to connect and collaborate.
+            Whether you need a job done or want to offer your skills, ChrisHub makes it secure and simple to connect and collaborate.
           </p>
           <div className="flex justify-center gap-4">
             <Link to="/services" className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">
