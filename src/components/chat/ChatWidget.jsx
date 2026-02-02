@@ -11,6 +11,7 @@ export default function ChatWidget() {
         isOpen,
         isLoading,
         unreadTotal,
+        connectionStatus,
         fetchMessages,
         sendMessage,
         openChat,
@@ -67,6 +68,16 @@ export default function ChatWidget() {
         return date.toLocaleDateString();
     };
 
+    const statusMeta = {
+        connected: { label: 'Live', className: 'text-emerald-100 bg-emerald-500/20 border-emerald-300/30' },
+        connecting: { label: 'Connecting', className: 'text-blue-100 bg-blue-500/20 border-blue-300/30' },
+        disconnected: { label: 'Offline', className: 'text-amber-100 bg-amber-500/20 border-amber-300/30' },
+        unavailable: { label: 'Offline', className: 'text-amber-100 bg-amber-500/20 border-amber-300/30' },
+        error: { label: 'Error', className: 'text-red-100 bg-red-500/20 border-red-300/30' },
+        unknown: { label: 'Unknown', className: 'text-slate-100 bg-slate-500/20 border-slate-300/30' },
+    };
+    const statusInfo = statusMeta[connectionStatus] || statusMeta.unknown;
+
     const currentUserId = user?.id;
 
     if (!user) return null;
@@ -104,6 +115,10 @@ export default function ChatWidget() {
                         <p className="text-blue-200 text-xs">{conversations.length} conversations</p>
                     )}
                 </div>
+                <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider border rounded-full px-2 py-0.5 ${statusInfo.className}`}> {/* CHANGED */}
+                    <span className="h-1.5 w-1.5 rounded-full bg-current"></span>
+                    {statusInfo.label}
+                </span>
                 <button onClick={closeChat} className="hover:bg-blue-700 p-1 rounded">
                     <X size={20} />
                 </button>

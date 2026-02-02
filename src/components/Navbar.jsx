@@ -4,7 +4,7 @@ import { User, LogOut, RefreshCw, Menu, X, LayoutDashboard, Settings } from 'luc
 import { useState, useEffect } from 'react';
 
 export default function Navbar() {
-  const { user, logout, switchRole } = useAuth();
+  const { user, logout, switchRole, isSwitchingRole } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -18,6 +18,7 @@ export default function Navbar() {
   }, []);
 
   const handleSwitchRole = async () => {
+    if (isSwitchingRole) return;
     await switchRole();
     setMenuOpen(false);
   };
@@ -69,9 +70,14 @@ export default function Navbar() {
                 
                 <button
                   onClick={handleSwitchRole}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-blue-600 border border-slate-200 rounded-full hover:border-blue-200 hover:bg-blue-50 transition-all"
+                  disabled={isSwitchingRole}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border border-slate-200 rounded-full transition-all ${
+                    isSwitchingRole
+                      ? 'text-slate-400 cursor-not-allowed bg-slate-50'
+                      : 'text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50'
+                  }`}
                 >
-                  <RefreshCw size={14} />
+                  <RefreshCw size={14} className={isSwitchingRole ? 'animate-spin' : ''} />
                   <span>{user.current_role}</span>
                 </button>
 
@@ -165,9 +171,14 @@ export default function Navbar() {
                 </Link>
                 <button
                   onClick={handleSwitchRole}
-                  className="w-full text-left px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-lg font-medium"
+                  disabled={isSwitchingRole}
+                  className={`w-full text-left px-4 py-2.5 rounded-lg font-medium ${
+                    isSwitchingRole
+                      ? 'text-slate-400 cursor-not-allowed bg-slate-50'
+                      : 'text-slate-600 hover:bg-slate-50'
+                  }`}
                 >
-                  Switch Role ({user.current_role})
+                  {isSwitchingRole ? 'Switching Role...' : `Switch Role (${user.current_role})`}
                 </button>
                 <button
                   onClick={logout}

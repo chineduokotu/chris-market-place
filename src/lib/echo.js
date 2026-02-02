@@ -5,7 +5,8 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 // Get the API URL from environment or default to localhost
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const apiBaseUrl = apiUrl.replace(/\/api\/?$/, '');
 
 // Create and configure Laravel Echo instance
 const echo = new Echo({
@@ -17,7 +18,7 @@ const echo = new Echo({
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
-    authEndpoint: `${apiUrl}/broadcasting/auth`,
+    authEndpoint: `${apiBaseUrl}/broadcasting/auth`,
     auth: {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -27,7 +28,12 @@ const echo = new Echo({
 
 // Update auth headers when token changes
 export const updateEchoAuth = (token) => {
-    echo.connector.options.auth.headers.Authorization = `Bearer ${token}`;
+    if (!echo?.connector?.options?.auth?.headers) return;
+    if (token) {
+        echo.connector.options.auth.headers.Authorization = `Bearer ${token}`;
+        return;
+    }
+    delete echo.connector.options.auth.headers.Authorization;
 };
 
 export default echo;

@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/client';
+import { updateEchoAuth } from '../lib/echo';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,6 +23,7 @@ export function AuthProvider({ children }) {
     const { user, token } = response.data;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    updateEchoAuth(token);
     setUser(user);
     return user;
   };
@@ -30,6 +33,7 @@ export function AuthProvider({ children }) {
     const { user, token } = response.data;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    updateEchoAuth(token);
     setUser(user);
     return user;
   };
@@ -41,15 +45,35 @@ export function AuthProvider({ children }) {
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    updateEchoAuth(null);
     setUser(null);
   };
 
   const switchRole = async () => {
-    const response = await api.post('/user/switch-role');
-    const updatedUser = response.data.user;
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    return updatedUser;
+    if (!user) return null;
+    if (isSwitchingRole) return user;
+
+    const previousUser = user;
+    const nextRole = previousUser.current_role === 'seeker' ? 'provider' : 'seeker';
+    const optimisticUser = { ...previousUser, current_role: nextRole };
+
+    setIsSwitchingRole(true);
+    setUser(optimisticUser);
+    localStorage.setItem('user', JSON.stringify(optimisticUser));
+
+    try {
+      const response = await api.post('/user/switch-role');
+      const updatedUser = response.data.user;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      localStorage.setItem('user', JSON.stringify(previousUser));
+      setUser(previousUser);
+      throw error;
+    } finally {
+      setIsSwitchingRole(false);
+    }
   };
 
   const updateUser = (updatedUser) => {
@@ -58,7 +82,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRole, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, isSwitchingRole, login, register, logout, switchRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

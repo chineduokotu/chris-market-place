@@ -38,6 +38,14 @@ export default function ServiceList() {
 
   const servicesCount = servicesData?.data?.length || 0;
 
+  const LoadingServices = () => (
+    <div className="mb-6 flex flex-wrap items-center gap-3 text-slate-600">
+      <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600"></div> {/* CHANGED */}
+      <p className="text-sm font-medium">Loading services...</p> {/* CHANGED */}
+      <span className="text-xs text-slate-400">Finding the best matches for you</span> {/* CHANGED */}
+    </div>
+  );
+
   return (
     <div className="bg-slate-50 min-h-screen">
       {/* Hero Header */}
@@ -112,25 +120,28 @@ export default function ServiceList() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoading ? (
-          <div className={`grid gap-6 ${
-            viewMode === 'grid' 
-              ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-              : 'grid-cols-1'
-          }`}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse"
-              >
-                <div className="h-48 bg-slate-200"></div>
-                <div className="p-5 space-y-3">
-                  <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-slate-200 rounded w-full"></div>
-                  <div className="h-3 bg-slate-200 rounded w-2/3"></div>
+          <>
+            <LoadingServices /> {/* CHANGED */}
+            <div className={`grid gap-6 ${
+              viewMode === 'grid' 
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+                : 'grid-cols-1'
+            }`}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl border border-slate-200 overflow-hidden animate-pulse"
+                >
+                  <div className="h-48 bg-slate-200"></div>
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-slate-200 rounded w-full"></div>
+                    <div className="h-3 bg-slate-200 rounded w-2/3"></div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         ) : servicesData?.data?.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
