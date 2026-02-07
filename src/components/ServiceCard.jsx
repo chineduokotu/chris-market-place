@@ -1,91 +1,59 @@
 import { Link } from 'react-router-dom';
-import { Star, Clock, MapPin, ArrowUpRight } from 'lucide-react';
+import { Star, MapPin, ArrowUpRight, Clock, Briefcase } from 'lucide-react';
 
-export default function ServiceCard({ service }) {
-  // Use service image or show placeholder icon
+export default function ServiceCard({ service, variant = 'default' }) {
   const hasImage = !!service.image;
+  const priceValue = Number(service.price);
+  const hasPrice = Number.isFinite(priceValue) && priceValue > 0;
+  const location = service.location || service.user?.location || 'Remote / Local';
+
+  const isCompact = variant === 'compact';
 
   return (
-    <div className="group bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300 overflow-hidden">
-      {/* Image Section */}
-      <div className="relative h-48 overflow-hidden bg-slate-100">
+    <div className={`group bg-white rounded-lg border border-slate-100 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full cursor-pointer ${isCompact ? 'max-w-[180px]' : ''}`}>
+      {/* Image Section - Jiji Pattern */}
+      <div className={`relative overflow-hidden bg-slate-50 ${isCompact ? 'aspect-square' : 'aspect-[4/3]'}`}>
         {hasImage ? (
           <img
             src={service.image}
             alt={service.title}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            decoding="async"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-            <svg className="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+            <Briefcase size={isCompact ? 24 : 32} className="text-slate-200" />
           </div>
         )}
-        {service.category && (
-          <span className="absolute top-3 left-3 text-xs font-semibold text-white bg-blue-600 px-3 py-1 rounded-full shadow-md">
-            {service.category.name}
+
+        {/* Category Badge - Jiji Pattern */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <span className="text-[9px] font-bold text-white bg-slate-800/80 backdrop-blur-sm px-2 py-1 rounded shadow-sm uppercase tracking-tighter">
+            {service.category?.name || 'Service'}
           </span>
-        )}
-        {/* Featured Badge (optional - shown for top services) */}
-        {service.is_featured && (
-          <span className="absolute top-3 right-3 text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded-full">
-            Featured
-          </span>
-        )}
+        </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-5">
+      <div className={`${isCompact ? 'p-2' : 'p-3'} flex flex-col flex-1`}>
         {/* Title */}
         <Link to={`/services/${service.id}`}>
-          <h3 className="text-lg font-semibold text-slate-900 hover:text-blue-600 transition-colors line-clamp-2 mb-2">
+          <h3 className={`${isCompact ? 'text-[11px]' : 'text-sm'} font-semibold text-slate-800 hover:text-black transition-colors line-clamp-2 mb-1 leading-tight`}>
             {service.title}
           </h3>
         </Link>
 
-        {/* Description */}
-        <p className="text-slate-500 text-sm leading-relaxed line-clamp-2 mb-4">
-          {service.description}
-        </p>
-
-        {/* Meta Info */}
-        <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-          <div className="flex items-center gap-1">
-            <Star size={14} className="text-amber-400 fill-amber-400" />
-            <span className="font-medium text-slate-700">4.9</span>
-            <span className="text-slate-400">(128)</span>
-          </div>
-          {service.location && (
-            <div className="flex items-center gap-1">
-              <MapPin size={14} />
-              <span>{service.location}</span>
-            </div>
-          )}
+        {/* Call to Action - Jiji Green */}
+        <div className={`${isCompact ? 'text-[10px]' : 'text-xs'} font-black text-black mt-1.5 uppercase tracking-wider`}>
+          Request Service!
         </div>
 
-        {/* Divider */}
-        <div className="border-t border-slate-100 pt-4">
-          <div className="flex items-center justify-between">
-            {/* Provider Info */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
-                {(service.user?.name || 'P').charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm text-slate-600 font-medium">
-                {service.user?.name || 'Service Provider'}
-              </span>
-            </div>
-
-            {/* View Button */}
-            <Link
-              to={`/services/${service.id}`}
-              className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-            >
-              View
-              <ArrowUpRight size={16} />
-            </Link>
+        {/* Location & Meta */}
+        <div className="mt-auto pt-2 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+          <div className="flex items-center gap-1">
+            <MapPin size={isCompact ? 10 : 12} />
+            <span className="line-clamp-1">{location}</span>
           </div>
         </div>
       </div>

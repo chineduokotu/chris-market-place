@@ -1,16 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --primary: #000000;
+  --primary-hover: #1a1a1a;
   --secondary: #64748b;
-  --accent: #f97316;
+  --accent: #1a1a1a;
   --background: #ffffff;
-  --surface: #fafafa;
-  --border: #e2e8f0;
-  --text-main: #0f172a;
-  --text-muted: #475569;
+  --surface: #ffffff;
+  --border: rgba(26, 26, 26, 0.1);
+  --text-main: #1a1a1a;
+  --text-muted: #666666;
+  --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -21,22 +23,55 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Heading hierarchy and typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+h2 {
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  letter-spacing: -0.015em;
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  color: var(--text-main);
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
+/* Focus-visible for accessibility - keyboard navigation */
+/* We handle these per-component or via Tailwind to ensure premium design */
+*:focus {
+  outline: none;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Card component with smooth transitions */
 .card-professional {
   background: white;
   border: 1px solid var(--border);
   border-radius: 12px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-base);
 }
 
 .card-professional:hover {
@@ -46,15 +81,44 @@ h6 {
   transform: translateY(-2px);
 }
 
+/* Primary button base styles */
 .btn-primary {
   background-color: var(--primary);
   color: white;
   padding: 0.625rem 1.25rem;
   border-radius: 8px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all var(--transition-base);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
+}
+
+/* Shake animation for error states */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
 }

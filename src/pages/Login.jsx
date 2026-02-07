@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import GoogleIcon from '../components/icons/GoogleIcon';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,98 +28,94 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 bg-slate-50/50">
-      <div className="max-w-[440px] w-full">
-        <div className="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100">
-          <div className="mb-10 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl text-white font-bold text-xl mb-6 shadow-lg shadow-blue-200">
-              S
-            </div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome back</h1>
-            <p className="text-slate-500 mt-2 text-sm">Please enter your details to sign in.</p>
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-8 bg-slate-50/50">
+      <div className="max-w-[400px] w-full">
+        <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100">
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Welcome back</h1>
+            <p className="text-slate-500 mt-1 text-sm font-medium">Please enter your details to sign in.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label="Sign in form">
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex gap-3 animate-shake">
-                <AlertCircle size={18} className="shrink-0" />
+              <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs font-bold flex gap-2 items-center animate-shake">
+                <AlertCircle size={16} className="shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
+            <div className="space-y-4">
+              <div className="relative group">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="name@company.com"
+                  autoComplete="email"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  placeholder="Email address"
                 />
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
               </div>
-            </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-semibold text-slate-700">
-                  Password
-                </label>
-                <a href="#" className="text-xs font-bold text-blue-600 hover:text-blue-700">Forgot?</a>
-              </div>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  placeholder="Password"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
               </div>
+            </div>
+
+            <div className="flex justify-end">
+              <a href="#" className="text-xs font-bold text-slate-500 hover:text-black transition-colors">Forgot password?</a>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-all shadow-lg shadow-blue-200 active:scale-[0.98] flex items-center justify-center overflow-hidden"
+              className="w-full py-3.5 bg-black text-white font-bold rounded-xl hover:bg-[#1a1a1a] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
             >
               {loading ? (
-                <Loader2 className="animate-spin" size={20} />
+                <Loader2 className="animate-spin" size={18} />
               ) : (
                 <>
                   <span>Sign in</span>
-                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                  <ArrowRight size={18} />
                 </>
               )}
             </button>
 
-            <div className="relative py-4">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-100"></div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold text-slate-400">
-                <span className="bg-white px-4">New here?</span>
+              <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-black text-slate-400">
+                <span className="bg-white px-2">Or continue with</span>
               </div>
             </div>
 
-            <Link
-              to="/register"
-              className="block w-full text-center py-4 text-slate-700 font-bold hover:bg-slate-50 rounded-xl border border-slate-200 transition-all active:scale-[0.98]"
+            <button
+              type="button"
+              className="w-full py-3.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
             >
-              Create an account
-            </Link>
+              <GoogleIcon size={18} />
+              <span>Google</span>
+            </button>
+
+            <p className="text-center text-xs font-medium text-slate-500 pt-2">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-black font-bold hover:underline">
+                Sign up
+              </Link>
+            </p>
           </form>
         </div>
-        <p className="text-center text-slate-400 mt-8 text-xs leading-relaxed">
-          By signing in, you agree to our <a href="#" className="underline">Terms of Service</a> <br /> 
-          and <a href="#" className="underline">Privacy Policy</a>.
-        </p>
       </div>
     </div>
   );

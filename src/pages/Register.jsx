@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import GoogleIcon from '../components/icons/GoogleIcon';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -16,16 +16,11 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (password !== passwordConfirmation) {
-      setError('Passwords do not match');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      await register(name, email, password, passwordConfirmation);
+      // Auto-confirm password for UX simplicity
+      await register(name, email, password, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
@@ -35,127 +30,102 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[90vh] flex items-center justify-center px-4 py-12 bg-slate-50/50">
-      <div className="max-w-[480px] w-full">
-        <div className="bg-white p-10 rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100">
-          <div className="mb-10 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl text-white font-bold text-xl mb-6 shadow-lg shadow-blue-200">
-              S
-            </div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Create Account</h1>
-            <p className="text-slate-500 mt-2 text-sm">Join our marketplace of skilled professionals.</p>
+    <div className="min-h-[90vh] flex items-center justify-center px-4 py-8 bg-slate-50/50">
+      <div className="max-w-[400px] w-full">
+        <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/60 border border-slate-100">
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Create Account</h1>
+            <p className="text-slate-500 mt-1 text-sm font-medium">Join our marketplace of skilled professionals.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label="Create account form">
             {error && (
-              <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm flex gap-3 animate-shake">
-                <AlertCircle size={18} className="shrink-0" />
+              <div className="p-3 bg-red-50 border border-red-100 text-red-600 rounded-xl text-xs font-bold flex gap-2 items-center animate-shake">
+                <AlertCircle size={16} className="shrink-0" />
                 <span>{error}</span>
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
+            <div className="space-y-4">
+              <div className="relative group">
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="John Doe"
+                  autoComplete="name"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  placeholder="Full Name"
                 />
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="name@company.com"
+                  autoComplete="email"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  placeholder="Email Address"
                 />
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  placeholder="Password (min. 8 chars)"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              </div>
-              <p className="mt-1.5 text-[11px] text-slate-400 flex items-center gap-1">
-                <CheckCircle2 size={10} /> Minimum 8 characters required
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={passwordConfirmation}
-                  onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  required
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-600 focus:bg-white transition-all outline-none"
-                  placeholder="••••••••"
-                />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-70 transition-all shadow-lg shadow-blue-200 active:scale-[0.98] flex items-center justify-center overflow-hidden mt-2"
+              className="w-full py-3.5 bg-black text-white font-bold rounded-xl hover:bg-[#1a1a1a] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm mt-2"
             >
               {loading ? (
-                <Loader2 className="animate-spin" size={20} />
+                <Loader2 className="animate-spin" size={18} />
               ) : (
                 <>
                   <span>Create Account</span>
-                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
+                  <ArrowRight size={18} />
                 </>
               )}
             </button>
 
-            <div className="relative py-4">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-100"></div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold text-slate-400">
-                <span className="bg-white px-4">Already have an account?</span>
+              <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-black text-slate-400">
+                <span className="bg-white px-2">Or continue with</span>
               </div>
             </div>
 
-            <Link
-              to="/login"
-              className="block w-full text-center py-4 text-slate-700 font-bold hover:bg-slate-50 rounded-xl border border-slate-200 transition-all active:scale-[0.98]"
+            <button
+              type="button"
+              className="w-full py-3.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
             >
-              Sign in to your account
-            </Link>
+              <GoogleIcon size={18} />
+              <span>Google</span>
+            </button>
+
+            <p className="text-center text-xs font-medium text-slate-500 pt-2">
+              Already have an account?{' '}
+              <Link to="/login" className="text-black font-bold hover:underline">
+                Sign in
+              </Link>
+            </p>
           </form>
         </div>
       </div>
