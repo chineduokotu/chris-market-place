@@ -194,7 +194,7 @@ export default function HomePage() {
               >
                 C
               </div>
-              <span className="hidden text-lg font-extrabold text-slate-900 sm:block">ChrisHub</span>
+              <span className="text-lg font-extrabold text-slate-900">ChrisHub</span>
             </Link>
 
             <form onSubmit={onSubmitSearch} className="hidden flex-1 md:flex">
