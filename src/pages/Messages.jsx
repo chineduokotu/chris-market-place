@@ -107,19 +107,19 @@ export default function Messages() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search messages..."
-                                className="w-full bg-slate-50 border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#000000]/20 outline-none placeholder:text-slate-500 font-medium"
+                                className="w-full bg-slate-50 border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-primary)_20%,white)] outline-none placeholder:text-slate-500 font-medium"
                             />
                         </div>
                         <div className="flex gap-2 mt-4">
                             <button
                                 onClick={() => setFilterType('all')}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'all' ? 'bg-[#000000] text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'all' ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : 'text-slate-500 hover:bg-slate-100'}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setFilterType('unread')}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'unread' ? 'bg-[#000000] text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'unread' ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : 'text-slate-500 hover:bg-slate-100'}`}
                             >
                                 Unread
                             </button>
@@ -138,7 +138,7 @@ export default function Messages() {
                                     key={conv.id}
                                     onClick={() => fetchMessages(conv.id)}
                                     className={`w-full p-4 text-left transition-all flex items-start gap-3 border-l-4 ${activeConversation?.id === conv.id
-                                        ? 'bg-slate-100/50 border-[#000000]'
+                                        ? 'bg-slate-100/50 border-[var(--color-border)]'
                                         : 'hover:bg-white border-transparent'
                                         }`}
                                 >
@@ -161,7 +161,7 @@ export default function Messages() {
                                                 {conv.last_message?.body || 'No messages yet'}
                                             </p>
                                             {conv.unread_count > 0 && (
-                                                <span className="w-5 h-5 bg-[#000000] text-white text-[10px] font-black rounded-full flex items-center justify-center shrink-0 ml-2 shadow-sm shadow-slate-100">
+                                                <span className="w-5 h-5 bg-[var(--color-primary)] text-[var(--color-text)] text-[10px] font-black rounded-full flex items-center justify-center shrink-0 ml-2 shadow-sm shadow-slate-100">
                                                     {conv.unread_count}
                                                 </span>
                                             )}
@@ -187,14 +187,14 @@ export default function Messages() {
                                     >
                                         <ArrowLeft size={24} />
                                     </button>
-                                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-slate-200 uppercase">
+                                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-[var(--color-text)] font-bold text-sm shadow-lg shadow-slate-200 uppercase">
                                         {activeConversation.other_user?.name?.charAt(0)}
                                     </div>
                                     <div>
                                         <h2 className="font-bold text-slate-900 leading-none">
                                             {activeConversation.other_user?.name}
                                         </h2>
-                                        <p className="text-[10px] font-bold text-[#000000] uppercase tracking-widest mt-1">Online</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Active Member</p>
                                     </div>
                                 </div>
                                 <button className="p-2 hover:bg-slate-50 rounded-lg text-slate-500">
@@ -222,7 +222,7 @@ export default function Messages() {
                                                 <div className={`max-w-[80%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
                                                     <div
                                                         className={`px-4 py-3 rounded-2xl shadow-sm text-sm font-medium leading-relaxed ${isOwn
-                                                            ? 'bg-[#000000] text-white rounded-br-none'
+                                                            ? 'bg-[var(--color-primary)] text-[var(--color-text)] rounded-br-none'
                                                             : 'bg-white border border-slate-100 text-slate-800 rounded-bl-none'
                                                             }`}
                                                     >
@@ -234,7 +234,7 @@ export default function Messages() {
                                                         </span>
                                                         {isOwn && (
                                                             msg.read_at ? (
-                                                                <CheckCheck size={14} className="text-[#000000]" />
+                                                                <CheckCheck size={14} className="text-[var(--color-text)]" />
                                                             ) : (
                                                                 <Check size={14} className="text-slate-300" />
                                                             )
@@ -257,13 +257,13 @@ export default function Messages() {
                                         value={newMessage}
                                         onChange={(e) => setNewMessage(e.target.value)}
                                         placeholder="Type a message..."
-                                        className="flex-1 px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[#000000]/20 outline-none placeholder:text-slate-500"
+                                        className="flex-1 px-5 py-3 bg-slate-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-[color-mix(in_srgb,var(--color-primary)_20%,white)] outline-none placeholder:text-slate-500"
                                         disabled={isSending}
                                     />
                                     <button
                                         type="submit"
                                         disabled={!newMessage.trim() || isSending}
-                                        className="w-12 h-12 bg-[#000000] text-white rounded-2xl flex items-center justify-center hover:bg-[#1a1a1a] active:scale-95 transition-all shadow-lg shadow-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-12 h-12 bg-[var(--color-primary)] text-[var(--color-text)] rounded-2xl flex items-center justify-center hover:bg-[var(--color-primary-strong)] active:scale-95 transition-all shadow-lg shadow-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Send size={20} className="translate-x-0.5 -translate-y-0.5" />
                                     </button>
@@ -273,7 +273,7 @@ export default function Messages() {
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-center p-12 bg-white">
                             <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-sm">
-                                <MessageSquare size={40} className="text-[#000000]" />
+                                <MessageSquare size={40} className="text-[var(--color-text)]" />
                             </div>
                             <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">My messages</h3>
                             <p className="text-slate-500 max-w-sm text-sm font-medium leading-relaxed">
@@ -287,3 +287,4 @@ export default function Messages() {
         </div>
     );
 }
+

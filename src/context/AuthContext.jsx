@@ -48,6 +48,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const switchRole = async () => {
+    const response = await api.post('/user/switch-role');
+    const updatedUser = response.data.user;
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
 
   const updateUser = (updatedUser) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -55,7 +63,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

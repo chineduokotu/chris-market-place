@@ -1,16 +1,79 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  Briefcase,
+  Camera,
+  Code,
+  Dumbbell,
+  Filter,
+  GraduationCap,
+  Hammer,
+  Heart,
+  Home as HomeIcon,
+  MapPin,
+  Music,
+  Palette,
+  Scissors,
+  Search,
+  ShoppingBag,
+  Smartphone,
+  Sparkles,
+  Star,
+  Truck,
+  Utensils,
+  Wrench,
+  Zap,
+} from 'lucide-react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import {
-  Briefcase, ArrowRight, Shield, Star, CheckCircle, Search, MapPin, Quote, Filter, X,
-  Home as HomeIcon, Droplets, Zap, GraduationCap, Dumbbell, Camera, Code, Palette, Smartphone,
-  Wrench, Hammer, Scissors, Truck, Utensils, Heart, Music, ShoppingBag
-} from 'lucide-react';
 import ServiceCard from '../components/ServiceCard';
+import { PageContainer } from '../components/layout/AppShell';
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardSkeleton,
+  Drawer,
+  EmptyState,
+  Input,
+  Select,
+} from '../components/ui';
 import { setMeta } from '../lib/seo';
 
+const iconMap = {
+  'Home Cleaning': HomeIcon,
+  Plumbing: Wrench,
+  Electrical: Zap,
+  Tutoring: GraduationCap,
+  'Fitness Training': Dumbbell,
+  Photography: Camera,
+  'Web Development': Code,
+  'Graphic Design': Palette,
+  'Mobile Repair': Smartphone,
+  'Repair Services': Wrench,
+  Construction: Hammer,
+  Tailoring: Scissors,
+  Logistics: Truck,
+  Catering: Utensils,
+  'Health & Beauty': Heart,
+  Entertainment: Music,
+  Shopping: ShoppingBag,
+};
+
+const testimonials = [
+  {
+    name: 'Samantha, Business Owner',
+    quote: 'I found a reliable designer in under 20 minutes. The platform flow is very clear.',
+  },
+  {
+    name: 'David, Homeowner',
+    quote: 'From search to messaging a provider, everything felt straightforward and fast.',
+  },
+];
 
 export default function Home() {
   const { user } = useAuth();
@@ -18,7 +81,9 @@ export default function Home() {
   const [query, setQuery] = useState(searchParams.get('search') || '');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Sync state with search params
+  const category = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
+
   useEffect(() => {
     setQuery(searchParams.get('search') || '');
   }, [searchParams]);
@@ -31,366 +96,330 @@ export default function Home() {
     });
   }, []);
 
-  const { data: categories, isLoading } = useQuery({
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+  } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
       const response = await api.get('/categories');
       return response.data;
     },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
   });
 
-  const { data: servicesData, isLoading: servicesLoading } = useQuery({
+  const {
+    data: servicesData,
+    isLoading: servicesLoading,
+    isError: servicesError,
+  } = useQuery({
     queryKey: ['services'],
     queryFn: async () => {
       const response = await api.get('/services');
       return response.data;
     },
+    staleTime: 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    retry: 1,
   });
 
-  const category = searchParams.get('category');
-  const searchQuery = searchParams.get('search');
-
   const filteredServices = useMemo(() => {
-    // Defensive extraction of real services from API response
     const apiServices = Array.isArray(servicesData?.data) ? servicesData.data : [];
-
     let results = [...apiServices];
 
     if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      results = results.filter((s) =>
-        s.title?.toLowerCase().includes(q) || s.description?.toLowerCase().includes(q)
+      const term = searchQuery.toLowerCase();
+      results = results.filter(
+        (service) =>
+          service.title?.toLowerCase().includes(term) || service.description?.toLowerCase().includes(term),
       );
     }
 
     if (category) {
-      results = results.filter((s) => s.category_id?.toString() === category);
+      results = results.filter((service) => service.category_id?.toString() === category);
     }
 
     return results;
   }, [servicesData, searchQuery, category]);
 
-  // Map category names to relevant icons
-  const getCategoryIcon = (name) => {
-    const iconMap = {
-      'Home Cleaning': HomeIcon,
-      'Plumbing': Droplets,
-      'Electrical': Zap,
-      'Tutoring': GraduationCap,
-      'Fitness Training': Dumbbell,
-      'Photography': Camera,
-      'Web Development': Code,
-      'Graphic Design': Palette,
-      'Mobile Repair': Smartphone,
-      'Repair Services': Wrench,
-      'Construction': Hammer,
-      'Tailoring': Scissors,
-      'Logistics': Truck,
-      'Catering': Utensils,
-      'Health & Beauty': Heart,
-      'Entertainment': Music,
-      'Shopping': ShoppingBag
-    };
-    return iconMap[name] || Briefcase;
+  const getCategoryIcon = (name) => iconMap[name] || Briefcase;
+
+  const updateParams = (updates) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    });
+    setSearchParams(next);
   };
 
   const handleSearch = (event) => {
     event.preventDefault();
-    const params = new URLSearchParams(searchParams);
-    if (query.trim()) {
-      params.set('search', query.trim());
-    } else {
-      params.delete('search');
-    }
-    setSearchParams(params);
+    updateParams({ search: query.trim() || '' });
   };
-
-  const updateParams = (updates) => {
-    const params = new URLSearchParams(searchParams);
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-      else params.delete(key);
-    });
-    setSearchParams(params);
-  };
-
-  if ((isLoading || servicesLoading)) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-black"></div>
-      </div>
-    );
-  }
 
   return (
-    <div className="bg-white">
-      {/* Hero Section - Search Centric (Jiji Style) with Background Image */}
-      <section className="relative py-12 md:py-24 overflow-hidden">
-        {/* Background Image & Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/assets/images/hero-bg.jpg"
-            alt="Hero Background"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=2000&q=80";
-            }}
-          />
-          <div className="absolute inset-0 bg-black/70"></div>
-        </div>
+    <div className="space-y-10 pb-14">
+      <section className="hero-glow border-b border-[var(--color-border)] bg-white pb-10 pt-8">
+        <PageContainer>
+          <div className="grid gap-8 lg:grid-cols-[1.35fr,0.65fr] lg:items-center">
+            <div className="space-y-5">
+              <Badge variant="featured" className="w-fit">
+                <Sparkles size={12} />
+                Trusted Marketplace
+              </Badge>
+              <h1 className="text-[clamp(2rem,4vw,2.65rem)] font-extrabold leading-[1.08] text-[var(--color-text)]">
+                Find the right service provider in one clear flow.
+              </h1>
+              <p className="max-w-2xl text-base leading-7 text-[var(--color-muted)]">
+                Search by need, compare trusted options, review provider profiles, and start messaging instantly.
+              </p>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-8 tracking-tight drop-shadow-sm">
-            The best way to find <span className="opacity-100 text-[#4ade80]">trusted services</span>
-          </h1>
-
-          <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto" role="search">
-            <div className="flex bg-white rounded-2xl overflow-hidden shadow-2xl shadow-black/20 p-1">
-              <div className="flex-1 flex items-center px-4 py-2 gap-3">
-                <Search size={22} className="text-slate-400" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="What service do you need?"
-                  className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 font-semibold text-lg h-12"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-black hover:bg-slate-900 text-white px-8 md:px-10 rounded-xl font-bold transition-all active:scale-95 shadow-md flex items-center justify-center"
-              >
-                Search
-              </button>
+              <form onSubmit={handleSearch} className="space-y-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="What service do you need?"
+                    aria-label="Search services"
+                    className="sm:flex-1"
+                  />
+                  <Button type="submit" className="sm:min-w-36">
+                    <Search size={16} />
+                    Search
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {['Cleaning', 'Plumbing', 'Tutoring'].map((term) => (
+                    <button
+                      key={term}
+                      type="button"
+                      onClick={() => {
+                        setQuery(term);
+                        updateParams({ search: term });
+                      }}
+                      className="rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--color-muted)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              </form>
             </div>
 
-            <div className="mt-8 flex flex-wrap justify-center items-center gap-3 text-sm font-semibold text-white/90">
-              <span className="opacity-70 uppercase tracking-widest text-[10px] bg-white/10 px-2 py-1 rounded">Popular:</span>
-              <button type="button" onClick={() => setQuery('Cleaning')} className="hover:text-[#4ade80] transition-colors bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">Cleaning</button>
-              <button type="button" onClick={() => setQuery('Plumbing')} className="hover:text-[#4ade80] transition-colors bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">Plumbing</button>
-              <button type="button" onClick={() => setQuery('Tutoring')} className="hover:text-[#4ade80] transition-colors bg-white/5 hover:bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">Tutoring</button>
-            </div>
-          </form>
-        </div>
+            <Card className="overflow-hidden">
+              <CardBody className="space-y-4">
+                <h2 className="text-base font-bold text-[var(--color-text)]">How the flow works</h2>
+                <ul className="space-y-3 text-sm text-[var(--color-muted)]">
+                  <li>1. Search services or browse categories</li>
+                  <li>2. Review service details and provider credibility</li>
+                  <li>3. Message providers and move work forward</li>
+                </ul>
+                <Link to="/how-it-works" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)]">
+                  See full process
+                  <ArrowRight size={14} />
+                </Link>
+              </CardBody>
+            </Card>
+          </div>
+        </PageContainer>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 relative">
-        <div className="lg:grid lg:grid-cols-[260px_1fr] gap-8 items-start">
+      <PageContainer className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-[var(--color-text)]">Discover Services</h2>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-[var(--radius-control)] border border-[var(--color-border)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-muted)] md:hidden"
+              onClick={() => setShowFilters(true)}
+              aria-label="Open category filters"
+            >
+              <Filter size={14} />
+              Filters
+            </button>
+            <Select aria-label="Sort services" defaultValue="recent" className="w-40">
+              <option value="recent">Most Recent</option>
+              <option value="price_low">Price Low-High</option>
+              <option value="price_high">Price High-Low</option>
+            </Select>
+          </div>
+        </div>
 
-          {/* Left Sidebar - Persistent Categories (Jiji Style) */}
-          <aside className="hidden lg:flex flex-col gap-4 sticky top-24 z-20">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-slate-50 bg-slate-50/50">
-                <h2 className="text-xs font-black uppercase tracking-widest text-slate-500">Categories</h2>
-              </div>
-              <div className="p-2 space-y-1">
+        <div className="grid gap-6 md:grid-cols-[250px,1fr]">
+          <aside className="hidden md:block">
+            <Card>
+              <CardHeader>
+                <h3 className="text-sm font-bold text-[var(--color-text)]">Categories</h3>
+              </CardHeader>
+              <CardBody className="space-y-2">
                 <button
+                  type="button"
                   onClick={() => updateParams({ category: '' })}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group ${!category ? 'bg-slate-50 text-[#000000]' : 'text-slate-600 hover:bg-slate-50'
-                    }`}
+                  className={`flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-sm font-semibold ${
+                    !category ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'text-[var(--color-muted)] hover:bg-slate-100'
+                  }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-lg transition-colors ${!category ? 'bg-white shadow-sm' : 'bg-slate-100 group-hover:bg-white'}`}>
-                      <Briefcase size={16} />
-                    </div>
-                    <span className="text-sm font-bold">All Categories</span>
-                  </div>
-                  <ArrowRight size={14} className={!category ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} />
+                  <span className="inline-flex items-center gap-2">
+                    <Briefcase size={14} />
+                    All Categories
+                  </span>
                 </button>
-
-                {categories?.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => updateParams({ category: cat.id.toString() })}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group ${category === cat.id.toString() ? 'bg-slate-50 text-[#000000]' : 'text-slate-600 hover:bg-slate-50'
+                {(categories || []).map((cat) => {
+                  const Icon = getCategoryIcon(cat.name);
+                  const active = category === cat.id.toString();
+                  return (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      onClick={() => updateParams({ category: cat.id.toString() })}
+                      className={`flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-sm font-semibold ${
+                        active ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]' : 'text-[var(--color-muted)] hover:bg-slate-100'
                       }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-1.5 rounded-lg transition-colors ${category === cat.id.toString() ? 'bg-white shadow-sm' : 'bg-slate-100 group-hover:bg-white'}`}>
-                        {(() => {
-                          const Icon = getCategoryIcon(cat.name);
-                          return <Icon size={16} />;
-                        })()}
-                      </div>
-                      <span className="text-sm font-bold">{cat.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-500">
-                      <span className="text-[10px] font-bold">{cat.services_count}</span>
-                      <ArrowRight size={14} className={category === cat.id.toString() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} />
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sub-sidebar for Filters */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Location</h3>
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-50 rounded-xl border border-slate-100 group focus-within:border-slate-100 focus-within:bg-white transition-all">
-                <MapPin size={16} className="text-slate-300" />
-                <input
-                  type="text"
-                  placeholder="Searching city..."
-                  className="bg-transparent border-none outline-none text-sm font-bold text-slate-700 w-full placeholder:text-slate-300"
-                />
-              </div>
-            </div>
+                    >
+                      <span className="inline-flex min-w-0 items-center gap-2">
+                        <Icon size={14} />
+                        <span className="truncate">{cat.name}</span>
+                      </span>
+                      <span className="text-xs">{cat.services_count ?? 0}</span>
+                    </button>
+                  );
+                })}
+              </CardBody>
+            </Card>
           </aside>
 
-          {/* Main Feed Content - Added min-w-0 to handle horizontal scrolls correctly */}
-          <main className="flex-1 min-w-0 space-y-10">
-
-            {/* Mobile-only Category Scroll (Jiji style) */}
-            <div className="lg:hidden">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-500">Categories</h3>
-                <button
-                  onClick={() => updateParams({ category: '' })}
-                  className="text-[10px] font-bold text-[#000000] uppercase tracking-wider"
-                >
-                  All Categories
-                </button>
-              </div>
-              <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar -mx-4 px-4">
-                {categories?.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => updateParams({ category: cat.id.toString() })}
-                    className={`flex flex-col items-center min-w-[70px] transition-all ${category === cat.id.toString() ? 'scale-105' : 'opacity-70 hover:opacity-100'
-                      }`}
-                  >
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-2 shadow-sm ${category === cat.id.toString() ? 'bg-[#000000] text-white' : 'bg-white text-slate-500 border border-slate-100'
-                      }`}>
-                      {(() => {
-                        const Icon = getCategoryIcon(cat.name);
-                        return <Icon size={20} />;
-                      })()}
-                    </div>
-                    <span className={`text-[10px] font-bold text-center w-full truncate px-1 uppercase tracking-tight ${category === cat.id.toString() ? 'text-[#000000]' : 'text-slate-500'
-                      }`}>
-                      {cat.name}
-                    </span>
-                  </button>
+          <section aria-label="Services results" className="space-y-4">
+            {(categoriesLoading || servicesLoading) && (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {[1, 2, 3, 4, 5, 6].map((item) => (
+                  <CardSkeleton key={item} />
                 ))}
               </div>
-            </div>
+            )}
 
+            {(categoriesError || servicesError) && !categoriesLoading && !servicesLoading ? (
+              <EmptyState
+                icon={Search}
+                title="Unable to load listings"
+                description="There was a problem loading categories or services. Please refresh and try again."
+              />
+            ) : null}
 
-            {/* Feed Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6" id="marketplace-heading">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">
-                  {searchQuery ? `Results for "${searchQuery}"` : category ? `${categories?.find(c => c.id.toString() === category)?.name}` : 'Featured Services'}
-                </h2>
-                <p className="text-slate-500 text-sm font-medium mt-2">
-                  Browse {filteredServices.length} professional listings
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 shadow-sm transition-all md:hidden"
-                >
-                  <Filter size={14} /> Filters
-                </button>
-                <select
-                  className="px-4 py-2.5 bg-white border border-slate-100 rounded-xl text-xs font-bold text-slate-600 outline-none focus:border-[#000000] shadow-sm cursor-pointer hover:bg-slate-50"
-                  defaultValue="recent"
-                >
-                  <option value="recent">Most Recent</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
-                </select>
-              </div>
-            </header>
-
-            {/* Service Grid Area */}
-            <div className="min-h-[400px]">
-              {isLoading || servicesLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-200 border-t-black"></div>
-                </div>
-              ) : filteredServices.length === 0 ? (
-                <div className="rounded-[2.5rem] border border-dashed border-slate-200 p-20 text-center bg-slate-50/30">
-                  <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-6">
-                    <Search className="text-slate-200" size={32} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 text-center">No service found</h3>
-                  <p className="text-slate-300 max-w-xs mx-auto text-sm leading-relaxed text-center">
-                    Try adjusting your search filters or browse other categories to find what you need.
-                  </p>
-                  <button
-                    onClick={() => setSearchParams({})}
-                    className="mt-8 px-6 py-2.5 bg-white border border-slate-100 text-slate-900 font-bold rounded-xl hover:bg-slate-50 transition-all text-xs shadow-sm mx-auto flex"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+            {!categoriesLoading && !servicesLoading && !servicesError ? (
+              filteredServices.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {filteredServices.map((service) => (
                     <ServiceCard key={service.id} service={service} />
                   ))}
                 </div>
-              )}
-            </div>
-          </main>
+              ) : (
+                <EmptyState
+                  icon={Search}
+                  title="No services found"
+                  description="Try another keyword or switch category filters to see more results."
+                  actionLabel="Clear filters"
+                  onAction={() => setSearchParams({})}
+                />
+              )
+            ) : null}
+          </section>
         </div>
-      </div>
+      </PageContainer>
 
-
-      {/* Features / Value Proposition Section */}
-      {!user && (
-        <section className="py-24 lg:py-28 bg-slate-900 text-white rounded-[2rem] sm:rounded-[3rem] mx-4 sm:mx-6 lg:mx-8 mb-24 overflow-hidden relative" aria-labelledby="features-heading">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-full opacity-10 pointer-events-none" aria-hidden>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/10 via-transparent to-transparent"></div>
-          </div>
-
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-              <div>
-                <h2 id="features-heading" className="text-3xl sm:text-4xl font-bold leading-tight mb-8 tracking-tight">
-                  The best way to get <br />
-                  <span className="text-white">your work done.</span>
-                </h2>
-                <ul className="space-y-6 list-none m-0 p-0">
-                  {[
-                    { title: "Safe & Secure", desc: "All transactions are protected by our secure payment system.", icon: Shield },
-                    { title: "Verified Pros", desc: "Work with background-checked professionals you can trust.", icon: Shield },
-                    { title: "24/7 Support", desc: "Our dedicated support team is here to help you anytime.", icon: CheckCircle }
-                  ].map((item, idx) => (
-                    <li key={idx} className="flex gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center shrink-0" aria-hidden>
-                        <item.icon className="text-black" size={24} />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg mb-1 text-white">{item.title}</h3>
-                        <p className="text-slate-300 text-sm leading-relaxed">{item.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="relative">
-                <div className="aspect-square bg-black rounded-3xl rotate-3 absolute inset-0 opacity-20"></div>
-                <div className="aspect-square bg-white/5 backdrop-blur-3xl rounded-3xl relative z-10 p-8 flex items-center justify-center border border-white/10">
-                  <div className="text-center">
-                    <div className="text-6xl font-black mb-4">98%</div>
-                    <div className="text-slate-300 font-medium">Customer satisfaction rate</div>
-                    <div className="mt-12 flex justify-center">
-                      <Link to="/register" className="inline-block px-8 py-4 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-100 active:scale-[0.98] transition-all duration-200">
-                        Get Started Now
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <PageContainer className="space-y-6">
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            { title: 'Verified providers', text: 'Trust signals and provider details help you choose quickly.' },
+            { title: 'Clear communication', text: 'Message directly inside the platform for safer conversations.' },
+            { title: 'Simple booking flow', text: 'From discovery to request tracking, everything is organized.' },
+          ].map((item) => (
+            <Card key={item.title}>
+              <CardBody className="space-y-2">
+                <h3 className="text-base font-bold text-[var(--color-text)]">{item.title}</h3>
+                <p className="text-sm">{item.text}</p>
+              </CardBody>
+            </Card>
+          ))}
         </section>
-      )}
+
+        <section className="grid gap-4 md:grid-cols-2">
+          {testimonials.map((item) => (
+            <Card key={item.name}>
+              <CardBody className="space-y-3">
+                <Star size={16} className="text-[var(--color-primary)]" />
+                <p className="text-sm leading-6 text-[var(--color-text)]">“{item.quote}”</p>
+                <p className="text-xs font-semibold text-[var(--color-muted)]">{item.name}</p>
+              </CardBody>
+            </Card>
+          ))}
+        </section>
+
+        {!user ? (
+          <Card className="overflow-hidden border-none bg-slate-900">
+            <CardBody className="flex flex-col gap-5 p-8 text-[var(--color-text)] md:flex-row md:items-center md:justify-between">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-extrabold text-[var(--color-text)]">Ready to offer your services?</h2>
+                <p className="max-w-xl text-slate-300">
+                  Create your profile, publish services, and connect with clients looking for trusted experts.
+                </p>
+              </div>
+              <Link to="/register">
+                <Button className="min-w-40">Become a Provider</Button>
+              </Link>
+            </CardBody>
+          </Card>
+        ) : null}
+      </PageContainer>
+
+      <Drawer isOpen={showFilters} onClose={() => setShowFilters(false)} title="Filter categories">
+        <div className="space-y-2">
+          <Button
+            variant={!category ? 'primary' : 'secondary'}
+            className="w-full justify-start"
+            onClick={() => {
+              updateParams({ category: '' });
+              setShowFilters(false);
+            }}
+          >
+            All Categories
+          </Button>
+          {(categories || []).map((cat) => {
+            const Icon = getCategoryIcon(cat.name);
+            const active = category === cat.id.toString();
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  updateParams({ category: cat.id.toString() });
+                  setShowFilters(false);
+                }}
+                className={`flex w-full items-center justify-between rounded-[10px] border px-3 py-2 text-left text-sm font-semibold ${
+                  active
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
+                    : 'border-[var(--color-border)] bg-white text-[var(--color-muted)]'
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <Icon size={14} />
+                  {cat.name}
+                </span>
+                <span>{cat.services_count ?? 0}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Drawer>
     </div>
   );
 }
+
+

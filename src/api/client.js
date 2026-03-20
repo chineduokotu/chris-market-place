@@ -1,13 +1,17 @@
 import axios from 'axios';
-const prod_url = "https://chris-market-place-server.onrender.com";
-//const dev_url="http://localhost:8000";
+//const prod_url = "https://chris-market-place-server.onrender.com";
+const dev_url = "http://localhost:8000";
+
+const resolvedBaseUrl = import.meta.env.VITE_API_URL
+  || (import.meta.env.DEV ? dev_url : prod_url) + '/api';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || prod_url + '/api',
+  baseURL: resolvedBaseUrl,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  timeout: 15000,
 });
 
 api.interceptors.request.use((config) => {

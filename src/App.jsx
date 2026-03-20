@@ -1,51 +1,54 @@
-import { Routes, Route } from 'react-router-dom'
-import { Suspense, lazy } from 'react'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import ChatWidget from './components/chat/ChatWidget'
-import ScrollToTop from './components/ScrollToTop'
-import BottomNav from './components/BottomNav'
+import { Routes, Route } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+import AppShell from './components/layout/AppShell';
+import ChatWidget from './components/chat/ChatWidget';
+import { Skeleton } from './components/ui';
 
-const Home = lazy(() => import('./pages/Home'))
-const ServiceDetail = lazy(() => import('./pages/ServiceDetail'))
-const ProviderProfile = lazy(() => import('./pages/ProviderProfile'))
-const Login = lazy(() => import('./pages/Login'))
-const Register = lazy(() => import('./pages/Register'))
-const Profile = lazy(() => import('./pages/Profile'))
-const HowItWorks = lazy(() => import('./pages/HowItWorks'))
-const Messages = lazy(() => import('./pages/Messages'))
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
+const ProviderProfile = lazy(() => import('./pages/ProviderProfile'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Profile = lazy(() => import('./pages/Profile'));
+const HowItWorks = lazy(() => import('./pages/HowItWorks'));
+const Messages = lazy(() => import('./pages/Messages'));
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <ScrollToTop />
-      <Navbar />
-      <main className="flex-grow pt-16 pb-16 md:pb-0" role="main">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-blue-600"></div>
+    <AppShell>
+      <Suspense
+        fallback={
+          <div className="container-app py-10">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[var(--radius-card)] border border-[var(--color-border)] bg-white p-4"
+                >
+                  <Skeleton className="mb-4 aspect-[4/3] w-full rounded-[14px]" />
+                  <Skeleton className="mb-2 h-4 w-4/5" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              ))}
             </div>
-          }
-        >
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/services/:id" element={<ServiceDetail />} />
-            <Route path="/providers/:id" element={<ProviderProfile />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Profile />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-          </Routes>
-        </Suspense>
-      </main>
-      <Footer />
-      <BottomNav />
-    </div>
-  )
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/services/:id" element={<ServiceDetail />} />
+          <Route path="/providers/:id" element={<ProviderProfile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
+        </Routes>
+      </Suspense>
+      <ChatWidget />
+    </AppShell>
+  );
 }
 
-export default App
-
+export default App;

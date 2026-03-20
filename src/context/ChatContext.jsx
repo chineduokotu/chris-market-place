@@ -60,7 +60,7 @@ export function ChatProvider({ children }) {
     // Fetch all conversations
     const fetchConversations = useCallback(async () => {
         try {
-            const response = await api.get('/conversations');
+            const response = await api.get('/conversations', { timeout: 30000 });
             setConversations(response.data);
             const total = response.data.reduce((sum, c) => sum + (c.unread_count || 0), 0);
             setUnreadTotal(total);
@@ -73,7 +73,7 @@ export function ChatProvider({ children }) {
     const fetchMessages = useCallback(async (conversationId) => {
         setIsLoading(true);
         try {
-            const response = await api.get(`/conversations/${conversationId}`);
+            const response = await api.get(`/conversations/${conversationId}`, { timeout: 30000 });
             setMessagesWithIds(response.data.messages || []);
             setActiveConversation(response.data);
             // Update unread count

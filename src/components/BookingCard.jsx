@@ -1,30 +1,20 @@
-import { CheckCircle, XCircle, Clock, Award, User, Calendar, ChevronRight, Phone, MessageCircle, Star } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, MessageCircle, Phone, User, XCircle } from 'lucide-react';
 import { useChat } from '../context/ChatContext';
-import { useState } from 'react';
-import api from '../api/client';
+import { Card, CardBody } from './ui/Card';
+import Badge from './ui/Badge';
+import Button from './ui/Button';
 
 const statusConfig = {
-  pending: { color: 'text-amber-600 bg-amber-50 border-amber-100', icon: Clock, label: 'Pending Approval' },
-  accepted: { color: 'text-blue-600 bg-blue-50 border-blue-100', icon: CheckCircle, label: 'Active Service' },
-  rejected: { color: 'text-slate-400 bg-slate-50 border-slate-100', icon: XCircle, label: 'Declined' },
-  completed: { color: 'text-emerald-600 bg-emerald-50 border-emerald-100', icon: Award, label: 'Deliverable Completed' },
-};
-
-const statusSteps = ['Requested', 'Accepted', 'In Progress', 'Completed'];
-
-const getStatusIndex = (status) => {
-  if (status === 'rejected') return 1;
-  if (status === 'pending') return 1;
-  if (status === 'accepted') return 3;
-  if (status === 'completed') return 4;
-  return 1;
+  pending: { label: 'Pending', badge: 'warning', icon: Clock },
+  accepted: { label: 'Accepted', badge: 'verified', icon: CheckCircle2 },
+  rejected: { label: 'Declined', badge: 'error', icon: XCircle },
+  completed: { label: 'Completed', badge: 'success', icon: CheckCircle2 },
 };
 
 export default function BookingCard({ booking, isProvider, onStatusChange }) {
   const { startConversation } = useChat();
-  const status = statusConfig[booking.status] || statusConfig.pending;
-  const StatusIcon = status.icon;
-  const statusIndex = getStatusIndex(booking.status);
+  const config = statusConfig[booking.status] || statusConfig.pending;
+  const StatusIcon = config.icon;
 
   const handleMessageProvider = async () => {
     if (booking.provider?.id) {
@@ -38,139 +28,78 @@ export default function BookingCard({ booking, isProvider, onStatusChange }) {
     }
   };
 
-
   return (
-    <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm shadow-slate-200/40 p-8 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-        <div className="flex-1 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${status.color}`}>
-              <StatusIcon size={12} />
-              {status.label}
-            </span>
-            {booking.service?.category && (
-              <span className="text-[10px] uppercase tracking-widest font-black text-slate-400 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-                {booking.service.category.name}
+    <Card>
+      <CardBody className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-[var(--color-text)]">{booking.service?.title || 'Untitled service'}</h3>
+            <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--color-muted)]">
+              <span className="inline-flex items-center gap-1.5">
+                <User size={14} />
+                {isProvider ? booking.seeker?.name : booking.provider?.name}
               </span>
-            )}
-          </div>
-
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
-              {booking.service?.title || 'Untitled Service'}
-            </h3>
-            <div className="mt-2 flex flex-wrap items-center gap-4 py-1">
-              <div className="flex items-center gap-2 text-slate-500">
-                <User size={14} className="text-slate-400" />
-                <span className="text-xs font-bold text-slate-700">
-                  {isProvider ? booking.seeker?.name : booking.provider?.name}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-500 border-l border-slate-200 pl-4">
-                <Calendar size={14} className="text-slate-400" />
-                <span className="text-xs font-bold text-slate-700">
-                  Requested {new Date(booking.created_at).toLocaleDateString()}
-                </span>
-              </div>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar size={14} />
+                {new Date(booking.created_at).toLocaleDateString()}
+              </span>
             </div>
           </div>
-
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-              <span>Progress</span>
-              <span>{statusSteps[Math.min(statusIndex - 1, statusSteps.length - 1)]}</span>
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {statusSteps.map((step, index) => {
-                const active = index < statusIndex;
-                return (
-                  <div key={step} className="flex flex-col items-center gap-2">
-                    <div
-                      className={`h-1.5 w-full rounded-full ${active ? 'bg-blue-600' : 'bg-slate-200'
-                        }`}
-                    ></div>
-                    <div className={`text-[10px] font-semibold ${active ? 'text-slate-700' : 'text-slate-400'}`}>
-                      {step}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {booking.notes && (
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-blue-600/20"></div>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">Request notes</p>
-              <p className="text-sm text-slate-600 italic leading-relaxed">
-                "{booking.notes}"
-              </p>
-            </div>
-          )}
-
+          <Badge variant={config.badge} className="capitalize">
+            <StatusIcon size={12} />
+            {config.label}
+          </Badge>
         </div>
 
-        <div className="shrink-0 flex flex-col items-end gap-4">
-          <div className="text-right">
-            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Status</div>
-            {/* Price removed */}
+        {booking.notes ? (
+          <div className="rounded-[12px] border border-[var(--color-border)] bg-slate-50 p-3 text-sm text-[var(--color-muted)]">
+            {booking.notes}
           </div>
+        ) : null}
 
-          {isProvider && booking.status === 'pending' && (
-            <div className="flex gap-2 w-full md:w-auto">
-              <button
-                onClick={() => onStatusChange(booking.id, 'accepted')}
-                className="flex-1 px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
-              >
+        <div className="flex flex-wrap gap-2">
+          {isProvider && booking.status === 'pending' ? (
+            <>
+              <Button size="sm" onClick={() => onStatusChange(booking.id, 'accepted')}>
                 Accept
-              </button>
-              <button
-                onClick={() => onStatusChange(booking.id, 'rejected')}
-                className="flex-1 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition-all active:scale-95"
-              >
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => onStatusChange(booking.id, 'rejected')}>
                 Decline
-              </button>
-            </div>
-          )}
+              </Button>
+            </>
+          ) : null}
 
-          {isProvider && booking.status === 'accepted' && (
-            <div className="flex flex-col gap-2 w-full md:w-auto">
-              <button
-                onClick={handleMessageSeeker}
-                className="w-full px-6 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <MessageCircle size={14} /> Message Client
-              </button>
-              <button
-                onClick={() => onStatusChange(booking.id, 'completed')}
-                className="w-full px-8 py-3 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                Finalize & Complete <ChevronRight size={14} />
-              </button>
-            </div>
-          )}
+          {isProvider && booking.status === 'accepted' ? (
+            <>
+              <Button size="sm" variant="secondary" onClick={handleMessageSeeker}>
+                <MessageCircle size={14} />
+                Message Client
+              </Button>
+              <Button size="sm" onClick={() => onStatusChange(booking.id, 'completed')}>
+                Complete Job
+              </Button>
+            </>
+          ) : null}
 
-          {!isProvider && booking.status === 'accepted' && booking.provider && (
-            <div className="flex gap-2 w-full md:w-auto">
-              {booking.provider.phone && (
-                <a
-                  href={`tel:${booking.provider.phone}`}
-                  className="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <Phone size={14} /> Call
+          {!isProvider && booking.status === 'accepted' && booking.provider ? (
+            <>
+              {booking.provider.phone ? (
+                <a href={`tel:${booking.provider.phone}`}>
+                  <Button size="sm" variant="secondary">
+                    <Phone size={14} />
+                    Call
+                  </Button>
                 </a>
-              )}
-              <button
-                onClick={handleMessageProvider}
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <MessageCircle size={14} /> Message
-              </button>
-            </div>
-          )}
+              ) : null}
+              <Button size="sm" onClick={handleMessageProvider}>
+                <MessageCircle size={14} />
+                Message
+              </Button>
+            </>
+          ) : null}
         </div>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   );
 }
 

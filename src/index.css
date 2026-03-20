@@ -1,41 +1,105 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
-  --primary: #000000;
-  --primary-hover: #1a1a1a;
-  --secondary: #64748b;
-  --accent: #1a1a1a;
-  --background: #ffffff;
-  --surface: #ffffff;
-  --border: rgba(26, 26, 26, 0.1);
-  --text-main: #1a1a1a;
-  --text-muted: #666666;
-  --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --color-primary: #2563eb;
+  --color-primary-strong: #1d4ed8;
+  --color-primary-soft: #dbeafe;
+  --color-primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 52%, #60a5fa 100%);
+  --color-background: #f4f8ff;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-muted: #475569;
+  --color-border: #c7d7f7;
+  --color-success: #0f766e;
+  --color-warning: #b45309;
+  --color-error: #b91c1c;
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --shadow-soft: 0 10px 30px rgba(37, 99, 235, 0.12);
+  --shadow-soft-hover: 0 18px 42px rgba(37, 99, 235, 0.18);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+}
+
+@theme {
+  --color-black: #0f172a;
+  --color-white: #ffffff;
+
+  --color-slate-50: #f8fbff;
+  --color-slate-100: #eff6ff;
+  --color-slate-200: #dbeafe;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  --color-orange-50: #fff7ed;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-700: #b45309;
+
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  --color-sky-500: #0ea5e9;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 body {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
-  color: var(--text-main);
-  background-color: var(--background);
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Heading hierarchy and typography */
-h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-h2 {
-  letter-spacing: -0.02em;
-}
-
-h3 {
-  letter-spacing: -0.015em;
 }
 
 h1,
@@ -44,81 +108,102 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 
-/* Focus-visible for accessibility - keyboard navigation */
-/* We handle these per-component or via Tailwind to ensure premium design */
-*:focus {
-  outline: none;
+h1 {
+  font-size: clamp(2rem, 3vw, 2.25rem);
+  line-height: 1.12;
 }
 
-/* Reduce motion for users who prefer it */
+h2 {
+  font-size: clamp(1.6rem, 2.3vw, 1.75rem);
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary) 32%, white);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-primary) 20%, white);
+  color: var(--color-text);
+}
+
+.container-app {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 2.6vw, 24px);
+}
+
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-glow {
+  position: relative;
+}
+
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  inset: -20% auto auto 50%;
+  width: 440px;
+  height: 280px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.22), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@layer utilities {
+  /* Only override ring colors to use brand primary for focus states */
+  [class*="ring-slate-"],
+  [class*="ring-red-"],
+  [class*="ring-orange-"],
+  [class*="ring-amber-"],
+  [class*="ring-emerald-"],
+  [class*="ring-blue-"],
+  [class*="ring-black"] {
+    --tw-ring-color: color-mix(in srgb, var(--color-primary) 32%, white) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-}
-
-/* Card component with smooth transitions */
-.card-professional {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  transition: all var(--transition-base);
-}
-
-.card-professional:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-    0 4px 6px -2px rgba(0, 0, 0, 0.02);
-  transform: translateY(-2px);
-}
-
-/* Primary button base styles */
-.btn-primary {
-  background-color: var(--primary);
-  color: white;
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: all var(--transition-base);
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-}
-
-/* Shake animation for error states */
-@keyframes shake {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-4px);
-  }
-
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(4px);
-  }
-}
-
-.animate-shake {
-  animation: shake 0.5s ease-in-out;
 }

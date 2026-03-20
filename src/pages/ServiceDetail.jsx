@@ -1,11 +1,27 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import {
+  ArrowLeft,
+  FileText,
+  MapPin,
+  MessageSquare,
+  Phone,
+  ShieldCheck,
+  User,
+} from 'lucide-react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
-import { User, ArrowLeft, Star, Shield, Clock, CheckCircle2, MessageSquare, ArrowUpRight, Calendar, FileText, Phone, MapPin, Share2, Flag } from 'lucide-react';
+import { PageContainer } from '../components/layout/AppShell';
+import { Badge, Button, Card, CardBody, CardHeader, EmptyState, Skeleton, Tabs } from '../components/ui';
 import { setMeta, setJsonLd } from '../lib/seo';
+
+const tabItems = [
+  { value: 'description', label: 'Description' },
+  { value: 'reviews', label: 'Reviews' },
+  { value: 'about', label: 'About Provider' },
+];
 
 export default function ServiceDetail() {
   const { id } = useParams();
@@ -14,14 +30,54 @@ export default function ServiceDetail() {
   const { startConversation } = useChat();
   const [isStartingChat, setIsStartingChat] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
+  const [activeTab, setActiveTab] = useState('description');
 
-  const { data: service, isLoading } = useQuery({
+  const { data: service, isLoading, isError } = useQuery({
     queryKey: ['service', id],
     queryFn: async () => {
       const response = await api.get(`/services/${id}`);
       return response.data;
     },
   });
+
+  const isOwnService = user && service?.user_id === user.id;
+
+  useEffect(() => {
+    if (!service) return;
+
+    setMeta({
+      title: `${service.title} | ChrisHub`,
+      description: service.description?.slice(0, 140) || 'Explore service details and request a booking.',
+      url: window.location.href,
+      image: service.image || undefined,
+    });
+
+    const absoluteUrl = window.location.href;
+    const priceValue = Number(service.price);
+    const hasPrice = Number.isFinite(priceValue) && priceValue > 0;
+
+    setJsonLd('service', {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: service.title,
+      description: service.description,
+      serviceType: service.category?.name || 'Professional Service',
+      url: absoluteUrl,
+      image: service.image || undefined,
+      provider: {
+        '@type': service.user?.name ? 'Person' : 'Organization',
+        name: service.user?.name || 'Service Provider',
+      },
+      areaServed: service.location || 'Local',
+      offers: {
+        '@type': 'Offer',
+        price: hasPrice ? priceValue : undefined,
+        priceCurrency: 'NGN',
+        availability: 'https://schema.org/InStock',
+        url: absoluteUrl,
+      },
+    });
+  }, [service]);
 
   const handleStartChat = async () => {
     if (!user) {
@@ -45,219 +101,185 @@ export default function ServiceDetail() {
     }
   };
 
-  const isOwnService = user && service?.user_id === user.id;
-
-  useEffect(() => {
-    if (service) {
-      setMeta({
-        title: `${service.title} | ChrisHub`,
-        description: service.description?.slice(0, 140) || 'Explore service details and request a booking.',
-        url: window.location.href,
-        image: service.image || undefined,
-      });
-
-      const absoluteUrl = window.location.href;
-      const priceValue = Number(service.price);
-      const hasPrice = Number.isFinite(priceValue) && priceValue > 0;
-
-      setJsonLd('service', {
-        '@context': 'https://schema.org',
-        '@type': 'Service',
-        name: service.title,
-        description: service.description,
-        serviceType: service.category?.name || 'Professional Service',
-        url: absoluteUrl,
-        image: service.image || undefined,
-        provider: {
-          '@type': service.user?.name ? 'Person' : 'Organization',
-          name: service.user?.name || 'Service Provider',
-        },
-        areaServed: service.location || 'Local',
-        offers: {
-          '@type': 'Offer',
-          price: hasPrice ? priceValue : undefined,
-          priceCurrency: 'NGN',
-          availability: 'https://schema.org/InStock',
-          url: absoluteUrl,
-        },
-      });
-    }
-  }, [service]);
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-200 border-t-black"></div>
-      </div>
+      <PageContainer className="space-y-5 py-8">
+        <Skeleton className="h-6 w-40" />
+        <div className="grid gap-6 lg:grid-cols-[1.8fr,1fr]">
+          <Skeleton className="aspect-[16/9] w-full rounded-[var(--radius-card)]" />
+          <Skeleton className="h-96 w-full rounded-[var(--radius-card)]" />
+        </div>
+      </PageContainer>
     );
   }
 
-  if (!service) {
+  if (isError || !service) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-        <h3 className="text-xl font-bold text-slate-900">Service not found</h3>
-        <button onClick={() => navigate('/')} className="mt-4 text-black font-bold hover:underline">Return to home</button>
-      </div>
+      <PageContainer className="py-10">
+        <EmptyState
+          icon={FileText}
+          title="Service not found"
+          description="This listing is unavailable or has been removed."
+          actionLabel="Return home"
+          onAction={() => navigate('/')}
+        />
+      </PageContainer>
     );
   }
+
+  const priceValue = Number(service.price);
+  const displayPrice = Number.isFinite(priceValue) && priceValue > 0 ? `₦${priceValue.toLocaleString()}` : 'Contact for price';
 
   return (
-    <div className="bg-slate-50 min-h-screen pb-20 pt-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 font-medium">
-          <Link to="/" className="hover:text-black transition-colors">Home</Link>
-          <span>/</span>
-          <span className="text-slate-900 line-clamp-1">{service.title}</span>
-        </nav>
+    <PageContainer className="space-y-6 py-8">
+      <div className="flex items-center gap-3 text-sm">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1 text-[var(--color-muted)] hover:text-[var(--color-primary)]"
+        >
+          <ArrowLeft size={14} />
+          Back
+        </button>
+        <span className="text-slate-400">/</span>
+        <span className="line-clamp-1 text-[var(--color-muted)]">{service.title}</span>
+      </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Image Gallery (Placeholder for now, using main image) */}
-            <div className="rounded-2xl overflow-hidden bg-white border border-slate-100 aspect-video relative group">
+      <div className="grid gap-6 lg:grid-cols-[1.8fr,1fr]">
+        <section className="space-y-5">
+          <Card className="overflow-hidden">
+            <div className="relative aspect-[16/9] bg-slate-100">
               {service.image ? (
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-full object-cover"
-                />
+                <img src={service.image} alt={service.title} className="h-full w-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-100">
-                  <FileText size={48} className="text-slate-300" />
+                <div className="flex h-full w-full items-center justify-center text-slate-500">No image available</div>
+              )}
+              {service.category ? (
+                <Badge variant="featured" className="absolute left-4 top-4">
+                  {service.category.name}
+                </Badge>
+              ) : null}
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader className="space-y-3">
+              <h1 className="text-2xl font-extrabold md:text-3xl">{service.title}</h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-muted)]">
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin size={14} />
+                  {service.location || service.user?.location || 'Remote service'}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <User size={14} />
+                  {service.user?.name || 'Provider'}
+                </span>
+              </div>
+            </CardHeader>
+
+            <CardBody className="space-y-4">
+              <Tabs tabs={tabItems} value={activeTab} onChange={setActiveTab} />
+
+              {activeTab === 'description' ? (
+                <div id="panel-description" role="tabpanel" aria-labelledby="tab-description" className="space-y-3">
+                  <h2 className="text-base font-bold text-[var(--color-text)]">Service Details</h2>
+                  <p className="whitespace-pre-wrap text-sm leading-7 text-[var(--color-muted)]">{service.description}</p>
+                </div>
+              ) : null}
+
+              {activeTab === 'reviews' ? (
+                <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews">
+                  <EmptyState
+                    title="No reviews yet"
+                    description="This provider has not received public reviews for this listing yet."
+                    className="p-8"
+                  />
+                </div>
+              ) : null}
+
+              {activeTab === 'about' ? (
+                <div id="panel-about" role="tabpanel" aria-labelledby="tab-about" className="space-y-3">
+                  <h2 className="text-base font-bold text-[var(--color-text)]">About the provider</h2>
+                  <p className="text-sm leading-7 text-[var(--color-muted)]">
+                    {service.user?.name || 'This provider'} offers services in {service.location || 'your region'}.
+                    Check their profile for portfolio and additional listings.
+                  </p>
+                  <Link
+                    to={`/providers/${service.user?.id}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)]"
+                  >
+                    View provider profile
+                  </Link>
+                </div>
+              ) : null}
+            </CardBody>
+          </Card>
+        </section>
+
+        <aside className="space-y-4 lg:sticky lg:top-24 lg:h-fit">
+          <Card>
+            <CardBody className="space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Price</p>
+                <p className="mt-1 text-3xl font-extrabold text-[var(--color-text)]">{displayPrice}</p>
+              </div>
+
+              {isOwnService ? (
+                <Link to="/dashboard">
+                  <Button className="w-full">Manage in dashboard</Button>
+                </Link>
+              ) : (
+                <div className="space-y-2">
+                  <Button className="w-full" onClick={handleStartChat} loading={isStartingChat}>
+                    <MessageSquare size={16} />
+                    Message provider
+                  </Button>
+                  <Button variant="secondary" className="w-full" onClick={() => setShowPhone((prev) => !prev)}>
+                    <Phone size={16} />
+                    {showPhone ? service.user?.phone || 'Phone unavailable' : 'Show phone'}
+                  </Button>
                 </div>
               )}
-              <div className="absolute top-4 left-4">
-                {service.category && (
-                  <span className="text-[10px] uppercase tracking-widest font-black text-white bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-sm">
-                    {service.category.name}
-                  </span>
-                )}
-              </div>
-            </div>
 
-            <div className="bg-white rounded-[2rem] p-8 md:p-10 border border-slate-100 shadow-sm">
-              <div className="flex items-start justify-between gap-6 mb-8">
-                <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">
-                  {service.title}
-                </h1>
-                <div className="flex gap-2 shrink-0">
-                  <button className="p-2.5 rounded-full bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                    <Share2 size={20} />
-                  </button>
-                  <button className="p-2.5 rounded-full bg-slate-50 text-slate-400 hover:text-black hover:bg-slate-200 transition-colors">
-                    <Flag size={20} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Location & Time */}
-              <div className="flex flex-wrap gap-6 text-sm text-slate-500 mb-8 pb-8 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <MapPin size={18} className="text-slate-400" />
-                  <span>{service.location || service.user?.location || 'Remote Service'}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={18} className="text-slate-400" />
-                  <span>Posted recently</span>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Description</h2>
-                <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed whitespace-pre-wrap">
-                  {service.description}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Price Card */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 sticky top-24">
-              <div className="mb-6">
-                <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Price</p>
-                <div className="text-3xl font-black text-slate-900">
-                  {Number(service.price) > 0 ? `₦${Number(service.price).toLocaleString()}` : "Contact for Price"}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {isOwnService ? (
-                  <div className="p-4 bg-slate-50 rounded-xl text-center border border-slate-200">
-                    <p className="text-sm font-bold text-slate-900">This is your service</p>
-                    <Link to="/dashboard" className="text-xs text-slate-500 hover:text-black hover:underline mt-1 block">Manage in Dashboard</Link>
-                  </div>
-                ) : (
-                  <>
-                    <button
-                      onClick={handleStartChat}
-                      disabled={isStartingChat}
-                      className="w-full py-4 bg-[#000000] text-white font-bold rounded-xl hover:bg-[#1a1a1a] shadow-lg shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                      {isStartingChat ? (
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <MessageSquare size={20} />
-                      )}
-                      <span>Chat with Provider</span>
-                    </button>
-
-                    <button
-                      onClick={() => setShowPhone(!showPhone)}
-                      className="w-full py-4 bg-white text-slate-900 border-2 border-slate-200 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                    >
-                      <Phone size={20} className={showPhone ? "text-green-600" : "text-slate-400"} />
-                      <span>{showPhone ? (service.user?.phone || "+234 *** *** ****") : "Show Contact"}</span>
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Safety Tips */}
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <h4 className="text-xs font-black uppercase tracking-widest text-slate-900 mb-4 flex items-center gap-2">
-                  <Shield size={14} /> Safety Tips
-                </h4>
-                <ul className="space-y-3 text-xs text-slate-500 font-medium">
-                  <li className="flex gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
-                    Don't pay in advance, including for delivery.
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
-                    Meet at a safe, public place.
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
-                    Inspect the service/item before paying.
-                  </li>
+              <div className="rounded-[12px] border border-[var(--color-border)] bg-slate-50 p-3">
+                <h3 className="mb-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text)]">
+                  <ShieldCheck size={14} />
+                  Safety tips
+                </h3>
+                <ul className="space-y-1 text-xs text-[var(--color-muted)]">
+                  <li>Meet in secure public spaces when possible.</li>
+                  <li>Discuss deliverables clearly before payment.</li>
+                  <li>Keep communication within platform chat.</li>
                 </ul>
               </div>
-            </div>
+            </CardBody>
+          </Card>
 
-            {/* Provider Profile Summary */}
-            <div className="bg-white rounded-3xl p-6 border border-slate-100">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
+          <Card>
+            <CardBody className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                   {service.user?.avatar ? (
-                    <img src={service.user.avatar} alt={service.user.name} className="w-full h-full rounded-full object-cover" />
+                    <img src={service.user.avatar} alt={service.user.name} className="h-full w-full rounded-full object-cover" />
                   ) : (
-                    <User size={28} />
+                    <User size={20} />
                   )}
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">{service.user?.name || "Provider"}</h3>
-                  <div className="text-xs text-slate-500 font-medium">Joined recently</div>
+                  <p className="text-sm font-bold text-[var(--color-text)]">{service.user?.name || 'Provider'}</p>
+                  <p className="text-xs text-[var(--color-muted)]">Profile available</p>
                 </div>
               </div>
-              <Link to={`/providers/${service.user?.id}`} className="block w-full py-2.5 text-center text-sm font-bold text-slate-600 hover:text-black bg-slate-50 hover:bg-slate-100 rounded-xl transition-all">
-                View Full Profile
+              <Link to={`/providers/${service.user?.id}`}>
+                <Button variant="secondary" className="w-full">
+                  View provider profile
+                </Button>
               </Link>
-            </div>
-          </div>
-        </div>
+            </CardBody>
+          </Card>
+        </aside>
       </div>
-    </div>
+    </PageContainer>
   );
 }
+

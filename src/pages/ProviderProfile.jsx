@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router-dom';
-import { MapPin, Star, ShieldCheck, Clock, CheckCircle2, ArrowRight, Briefcase } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { MapPin, ShieldCheck, Clock, CheckCircle2, ArrowRight, Briefcase, ArrowLeft } from 'lucide-react';
 import api from '../api/client';
 import ServiceCard from '../components/ServiceCard';
 import { setMeta, setJsonLd } from '../lib/seo';
@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 
 export default function ProviderProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: servicesData, isLoading } = useQuery({
     queryKey: ['provider-services', id],
@@ -51,8 +52,17 @@ export default function ProviderProfile() {
   return (
     <div className="bg-slate-50 min-h-screen pb-16">
       {/* Header */}
-      <section className="relative bg-black text-white">
+      <section className="relative bg-[var(--color-primary)] text-[var(--color-text)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </button>
+
           <div className="flex flex-col lg:flex-row lg:items-end gap-6">
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-2xl font-black">
@@ -123,7 +133,7 @@ export default function ProviderProfile() {
                 No services listed yet.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
                 {services.map((service) => (
                   <ServiceCard key={service.id} service={service} />
                 ))}
@@ -156,7 +166,7 @@ export default function ProviderProfile() {
             <h3 className="text-lg font-bold text-slate-900 mb-4">Quick actions</h3>
             <Link
               to={services[0] ? `/services/${services[0].id}` : '/services'}
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-black text-white font-bold rounded-xl hover:bg-[#1a1a1a] transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] transition-colors"
             >
               Request Service
               <ArrowRight size={18} />
@@ -181,3 +191,4 @@ export default function ProviderProfile() {
     </div>
   );
 }
+

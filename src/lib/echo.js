@@ -4,19 +4,25 @@ import Pusher from 'pusher-js';
 // Make Pusher available globally for Laravel Echo
 window.Pusher = Pusher;
 
-// Get the API URL from environment or default to localhost
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const prodApiUrl = 'https://chris-market-place-server.onrender.com/api';
+const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000/api' : prodApiUrl);
 const apiBaseUrl = apiUrl.replace(/\/api\/?$/, '');
+const apiHost = new URL(apiBaseUrl).hostname;
+const apiProtocol = new URL(apiBaseUrl).protocol.replace(':', '');
+
+const scheme = import.meta.env.VITE_REVERB_SCHEME || apiProtocol || 'http';
+const isSecure = scheme === 'https';
+const resolvedPort = Number(import.meta.env.VITE_REVERB_PORT || (isSecure ? 443 : 80));
 
 // Create and configure Laravel Echo instance
 const echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY || 'servicehub-key',
-    wsHost: import.meta.env.VITE_REVERB_HOST || '127.0.0.1',
-    wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
-    wssPort: import.meta.env.VITE_REVERB_PORT || 8080,
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME || 'http') === 'https',
-    enabledTransports: ['ws', 'wss'],
+    wsHost: import.meta.env.VITE_REVERB_HOST || apiHost,
+    wsPort: resolvedPort,
+    wssPort: resolvedPort,
+    forceTLS: isSecure,
+    enabledTransports: isSecure ? ['wss'] : ['ws', 'wss'],
     disableStats: true,
     authEndpoint: `${apiBaseUrl}/broadcasting/auth`,
     auth: {

@@ -16,7 +16,7 @@ export default function HowItWorks() {
             Whether you need a job done or want to offer your skills, ChrisHub makes it secure and simple to connect and collaborate.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/services" className="px-8 py-4 bg-black text-white font-bold rounded-2xl hover:bg-[#1a1a1a] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]">
+            <Link to="/services" className="px-8 py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-2xl hover:bg-[var(--color-primary-strong)] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]">
               Find Services
             </Link>
             <Link to="/register" className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all duration-200 active:scale-[0.98]">
@@ -39,7 +39,7 @@ export default function HowItWorks() {
             <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 -z-10"></div>
 
             <div className="relative text-center group">
-              <div className="w-24 h-24 bg-white border-2 border-black/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-24 h-24 bg-white border-2 border-[color-mix(in_srgb,var(--color-border)_25%,white)] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
                 <Search size={40} className="text-black" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-4">1. Find a Service</h3>
@@ -49,7 +49,7 @@ export default function HowItWorks() {
             </div>
 
             <div className="relative text-center group">
-              <div className="w-24 h-24 bg-white border-2 border-black/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-24 h-24 bg-white border-2 border-[color-mix(in_srgb,var(--color-border)_25%,white)] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
                 <MessageCircle size={40} className="text-black" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-4">2. Discuss & Agree</h3>
@@ -59,7 +59,7 @@ export default function HowItWorks() {
             </div>
 
             <div className="relative text-center group">
-              <div className="w-24 h-24 bg-white border-2 border-black/10 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
+              <div className="w-24 h-24 bg-white border-2 border-[color-mix(in_srgb,var(--color-border)_25%,white)] rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-slate-100 group-hover:-translate-y-2 transition-transform duration-300">
                 <CheckCircle size={40} className="text-black" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-4">3. Complete Project</h3>
@@ -98,12 +98,12 @@ export default function HowItWorks() {
 
       {/* Trust & Safety */}
       {!user && (
-        <section className="bg-slate-900 text-white rounded-[2rem] sm:rounded-[3rem] mx-4 sm:mx-8 p-8 md:p-16 relative overflow-hidden" aria-labelledby="safety-heading">
+        <section className="bg-slate-900 text-[var(--color-text)] rounded-[2rem] sm:rounded-[3rem] mx-4 sm:mx-8 p-8 md:p-16 relative overflow-hidden" aria-labelledby="safety-heading">
           <div className="absolute top-0 right-0 w-96 h-96 bg-black/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3"></div>
 
           <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <ShieldCheck size={64} className="text-white mx-auto mb-8" aria-hidden />
+            <ShieldCheck size={64} className="text-[var(--color-text)] mx-auto mb-8" aria-hidden />
             <h2 id="safety-heading" className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Your safety is our priority</h2>
             <p className="text-slate-300 text-lg leading-relaxed mb-10">
               We have implemented robust measures to ensure a secure environment for all users. From verified profiles to secure communication channels, we've got you covered.
@@ -117,3 +117,4 @@ export default function HowItWorks() {
     </div>
   );
 }
+

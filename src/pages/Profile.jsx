@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -12,9 +12,11 @@ import {
 } from 'lucide-react';
 
 export default function Profile() {
-  const { user, logout, updateUser } = useAuth();
+  const { user, logout, switchRole, updateUser } = useAuth();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('services'); // 'services', 'requests', 'feedback', 'performance'
+  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
+  const [serviceSubmitError, setServiceSubmitError] = useState('');
 
   // Dashboard states
   const [showServiceForm, setShowServiceForm] = useState(false);
@@ -23,6 +25,8 @@ export default function Profile() {
     category_id: '',
     title: '',
     description: '',
+    location: '',
+    price: '',
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -46,15 +50,19 @@ export default function Profile() {
       const response = await api.get('/user');
       return response.data;
     },
-    onSuccess: (data) => {
-      setFormData({
-        name: data.name || '',
-        phone: data.phone || '',
-        whatsapp_number: data.whatsapp_number || '',
-      });
-    },
     enabled: !!user,
   });
+
+  // Sync server profile into form when it loads (onSuccess was removed in TanStack Query v5)
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        name: userProfile.name || '',
+        phone: userProfile.phone || '',
+        whatsapp_number: userProfile.whatsapp_number || '',
+      });
+    }
+  }, [userProfile]);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -120,12 +128,16 @@ export default function Profile() {
       });
     },
     onSuccess: () => {
+      setServiceSubmitError('');
       queryClient.invalidateQueries(['my-services']);
       setShowServiceForm(false);
       setEditingService(null);
-      setServiceForm({ category_id: '', title: '', description: '' });
+      setServiceForm({ category_id: '', title: '', description: '', location: '', price: '' });
       setImageFile(null);
       setImagePreview(null);
+    },
+    onError: (error) => {
+      setServiceSubmitError(error.response?.data?.message || 'Unable to post service. Check the form and try again.');
     },
   });
 
@@ -136,12 +148,16 @@ export default function Profile() {
       });
     },
     onSuccess: () => {
+      setServiceSubmitError('');
       queryClient.invalidateQueries(['my-services']);
       setShowServiceForm(false);
       setEditingService(null);
-      setServiceForm({ category_id: '', title: '', description: '' });
+      setServiceForm({ category_id: '', title: '', description: '', location: '', price: '' });
       setImageFile(null);
       setImagePreview(null);
+    },
+    onError: (error) => {
+      setServiceSubmitError(error.response?.data?.message || 'Unable to update service. Check the form and try again.');
     },
   });
 
@@ -184,12 +200,30 @@ export default function Profile() {
     statusMutation.mutate({ bookingId, status });
   };
 
+  const ensureProviderRole = async () => {
+    if (isProvider) return true;
+    setIsSwitchingRole(true);
+    try {
+      const updatedUser = await switchRole();
+      return updatedUser?.current_role === 'provider';
+    } catch (error) {
+      return false;
+    } finally {
+      setIsSwitchingRole(false);
+    }
+  };
+
   const handleCreateService = (e) => {
     e.preventDefault();
+    if (!isProvider) return;
+
+    setServiceSubmitError('');
     const formDataObj = new FormData();
     formDataObj.append('category_id', serviceForm.category_id);
     formDataObj.append('title', serviceForm.title);
     formDataObj.append('description', serviceForm.description);
+    formDataObj.append('location', serviceForm.location || '');
+    if (serviceForm.price) formDataObj.append('price', serviceForm.price);
     if (imageFile) formDataObj.append('image', imageFile);
 
     if (editingService) {
@@ -200,11 +234,14 @@ export default function Profile() {
   };
 
   const handleEditService = (service) => {
+    setServiceSubmitError('');
     setEditingService(service);
     setServiceForm({
       category_id: service.category_id,
       title: service.title,
       description: service.description,
+      location: service.location || '',
+      price: service.price || '',
     });
     setImageFile(null);
     setImagePreview(service.image || null);
@@ -212,9 +249,10 @@ export default function Profile() {
   };
 
   const handleCancelEdit = () => {
+    setServiceSubmitError('');
     setShowServiceForm(false);
     setEditingService(null);
-    setServiceForm({ category_id: '', title: '', description: '' });
+    setServiceForm({ category_id: '', title: '', description: '', location: '', price: '' });
     setImageFile(null);
     setImagePreview(null);
   };
@@ -241,12 +279,12 @@ export default function Profile() {
   if (!user) return <Navigate to="/login" />;
   if (profileLoading) return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <Loader2 className="animate-spin text-[#000000]" size={40} />
+      <Loader2 className="animate-spin text-[var(--color-text)]" size={40} />
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#f4f4f4] pb-20 pt-8 mt-2">
+    <div className="min-h-screen bg-[var(--color-background)] pb-20 pt-8 mt-2">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-[280px_1fr] gap-8 items-start">
 
@@ -255,7 +293,7 @@ export default function Profile() {
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 text-center relative group">
               <button
                 onClick={() => setActiveTab('settings')}
-                className="absolute top-4 right-4 p-2 text-slate-500 hover:text-[#000000] transition-colors"
+                className="absolute top-4 right-4 p-2 text-slate-500 hover:text-[var(--color-text)] transition-colors"
                 title="Settings"
               >
                 <Settings size={20} />
@@ -276,9 +314,9 @@ export default function Profile() {
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
                   {profileMutation.isPending ? (
-                    <Loader2 size={24} className="text-white animate-spin" />
+                    <Loader2 size={24} className="text-[var(--color-text)] animate-spin" />
                   ) : (
-                    <ImagePlus size={24} className="text-white" />
+                    <ImagePlus size={24} className="text-[var(--color-text)]" />
                   )}
                 </div>
                 <input
@@ -295,7 +333,7 @@ export default function Profile() {
             </div>
 
             {/* Jiji Advice Card */}
-            <div className="bg-[#ff9c33] rounded-2xl p-4 text-white shadow-sm overflow-hidden relative">
+            <div className="bg-[var(--color-primary)] rounded-2xl p-4 text-[var(--color-text)] shadow-sm overflow-hidden relative">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded">Advice</span>
                 <span className="text-[10px] opacity-70">hide 2</span>
@@ -326,14 +364,14 @@ export default function Profile() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mb-1 ${activeTab === item.id ? 'bg-[#000000]/5 text-[#000000]' : 'text-slate-600 hover:bg-slate-50'
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mb-1 ${activeTab === item.id ? 'bg-[color-mix(in_srgb,var(--color-primary)_12%,white)] text-[var(--color-text)]' : 'text-slate-600 hover:bg-slate-50'
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={18} className={activeTab === item.id ? 'text-[#000000]' : 'text-slate-500 grouplaceholder:text-slate-500'} />
+                    <item.icon size={18} className={activeTab === item.id ? 'text-[var(--color-text)]' : 'text-slate-500 grouplaceholder:text-slate-500'} />
                     <span className="text-sm font-bold">{item.label}</span>
                     {item.count && (
-                      <span className={`ml-1 text-[10px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full ${activeTab === item.id ? 'bg-[#000000] text-white' : ''}`}>
+                      <span className={`ml-1 text-[10px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full ${activeTab === item.id ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : ''}`}>
                         {item.count}
                       </span>
                     )}
@@ -361,16 +399,23 @@ export default function Profile() {
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <h1 className="text-2xl font-black text-slate-900 tracking-tight">My Services</h1>
                   <button
-                    onClick={() => setShowServiceForm(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[#000000] text-white font-bold rounded-xl hover:bg-[#1a1a1a] transition-all shadow-lg shadow-slate-100 active:scale-95 uppercase tracking-wider text-xs"
+                    onClick={async () => {
+                      const canPost = await ensureProviderRole();
+                      if (canPost) {
+                        setServiceSubmitError('');
+                        setShowServiceForm(true);
+                      }
+                    }}
+                    disabled={isSwitchingRole}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] transition-all shadow-lg shadow-slate-100 active:scale-95 uppercase tracking-wider text-xs"
                   >
-                    <Plus size={18} />
-                    <span>Add New Service</span>
+                    {isSwitchingRole ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                    <span>{isProvider ? 'Add New Service' : 'Enable Provider Mode'}</span>
                   </button>
                 </div>
 
                 <div className="flex gap-6 border-b border-slate-200 pb-0 mb-6">
-                  <button className="px-4 py-3 border-b-2 border-[#000000] text-[#000000] font-bold text-sm flex items-center gap-2">
+                  <button className="px-4 py-3 border-b-2 border-[var(--color-border)] text-[var(--color-text)] font-bold text-sm flex items-center gap-2">
                     <CheckCircle2 size={16} />
                     <span>{myServices?.length || 0} Active</span>
                   </button>
@@ -387,7 +432,7 @@ export default function Profile() {
                       <p className="text-xs text-slate-500 font-medium">for your ads</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-[#000000] text-xs font-bold">
+                  <div className="flex items-center gap-2 text-[var(--color-text)] text-xs font-bold">
                     <span>Learn more</span>
                     <ChevronRight size={14} />
                   </div>
@@ -404,15 +449,22 @@ export default function Profile() {
                       <h3 className="text-lg font-bold text-slate-900">No ads yet</h3>
                       <p className="text-slate-500 text-sm max-w-xs mx-auto mb-8">Start offering your services today to find clients.</p>
                       <button
-                        onClick={() => setShowServiceForm(true)}
-                        className="px-8 py-3 bg-[#000000] text-white font-bold rounded-xl shadow-lg shadow-emerald-200 uppercase tracking-wider text-xs"
+                        onClick={async () => {
+                          const canPost = await ensureProviderRole();
+                          if (canPost) {
+                            setServiceSubmitError('');
+                            setShowServiceForm(true);
+                          }
+                        }}
+                        disabled={isSwitchingRole}
+                        className="px-8 py-3 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl shadow-lg shadow-emerald-200 uppercase tracking-wider text-xs"
                       >
-                        Publish your first service
+                        {isSwitchingRole ? 'Switching to provider...' : (isProvider ? 'Publish your first service' : 'Become a provider to post')}
                       </button>
                     </div>
                   ) : (
                     myServices?.map((service) => (
-                      <div key={service.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col sm:flex-row p-4 gap-6 group hover:border-[#000000]/20 transition-all">
+                      <div key={service.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col sm:flex-row p-4 gap-6 group hover:border-[color-mix(in_srgb,var(--color-border)_20%,transparent)] transition-all">
                         <div className="w-full sm:w-48 h-48 sm:h-32 bg-slate-50 rounded-xl overflow-hidden shrink-0 relative">
                           {service.image ? (
                             <img src={service.image} className="w-full h-full object-cover" alt={service.title} />
@@ -421,7 +473,7 @@ export default function Profile() {
                               <ImagePlus size={32} />
                             </div>
                           )}
-                          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-black px-1.5 py-0.5 rounded flex items-center gap-1">
+                          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-[var(--color-text)] text-[10px] font-black px-1.5 py-0.5 rounded flex items-center gap-1">
                             <Camera size={10} />
                             <span>1</span>
                           </div>
@@ -431,9 +483,9 @@ export default function Profile() {
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{service.category?.name || 'Service'}</p>
-                              <h3 className="text-lg font-bold text-slate-900 group-hover:text-[#000000] transition-colors line-clamp-1">{service.title}</h3>
+                              <h3 className="text-lg font-bold text-slate-900 group-hover:text-[var(--color-text)] transition-colors line-clamp-1">{service.title}</h3>
                             </div>
-                            <div className="bg-slate-50 text-[#000000] text-[10px] font-black px-2 py-1 rounded-full border border-black/10 uppercase">
+                            <div className="bg-slate-50 text-[var(--color-text)] text-[10px] font-black px-2 py-1 rounded-full border border-[color-mix(in_srgb,var(--color-border)_25%,white)] uppercase">
                               Active
                             </div>
                           </div>
@@ -452,19 +504,25 @@ export default function Profile() {
                               <span>0 phone views</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <MessageSquare size={12} className="text-[#000000]" />
+                              <MessageSquare size={12} className="text-[var(--color-text)]" />
                               <span>0 chats</span>
                             </div>
                           </div>
 
                           <div className="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <button onClick={() => handleEditService(service)} className="text-[#000000] text-xs font-black uppercase tracking-wider hover:opacity-80">Edit</button>
-                              <button className="text-[#000000] text-xs font-black uppercase tracking-wider hover:opacity-80">Renew</button>
+                              <button
+                                onClick={() => handleEditService(service)}
+                                className="rounded-lg bg-emerald-50 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                              >
+                                Edit
+                              </button>
                               <button
                                 onClick={() => handleDeleteService(service.id)}
-                                className="text-red-500 text-xs font-black uppercase tracking-wider hover:opacity-80"
-                              >Close</button>
+                                className="rounded-lg bg-red-50 px-4 py-2 text-xs font-black uppercase tracking-wider text-red-600 border border-red-200 hover:bg-red-100 transition-colors"
+                              >
+                                Delete
+                              </button>
                             </div>
                             <button className="px-4 py-1.5 border border-orange-400 text-orange-500 text-[10px] font-black uppercase rounded-lg hover:bg-orange-50 transition-colors">
                               Top Ad
@@ -520,7 +578,7 @@ export default function Profile() {
                     <p className="text-slate-500 text-sm font-medium">Update your public profile and contact info</p>
                   </div>
                   {profileMutation.isSuccess && (
-                    <div className="bg-slate-50 text-[#000000] text-xs font-black px-4 py-2 rounded-xl flex items-center gap-2 animate-bounce">
+                    <div className="bg-slate-50 text-[var(--color-text)] text-xs font-black px-4 py-2 rounded-xl flex items-center gap-2 animate-bounce">
                       <CheckCircle2 size={16} />
                       Saved!
                     </div>
@@ -536,7 +594,7 @@ export default function Profile() {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all"
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
                         />
                       </div>
                       <div className="space-y-2">
@@ -558,7 +616,7 @@ export default function Profile() {
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           placeholder="+234..."
-                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all"
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
                         />
                       </div>
                       <div className="space-y-2">
@@ -568,7 +626,7 @@ export default function Profile() {
                           value={formData.whatsapp_number}
                           onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
                           placeholder="234..."
-                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all"
+                          className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
                         />
                       </div>
                     </div>
@@ -577,7 +635,7 @@ export default function Profile() {
                       <button
                         type="submit"
                         disabled={profileMutation.isPending}
-                        className="px-10 py-4 bg-[#000000] text-white font-black rounded-2xl shadow-lg shadow-emerald-200 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
+                        className="px-10 py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-black rounded-2xl shadow-lg shadow-emerald-200 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
                       >
                         {profileMutation.isPending ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
                         Save Changes
@@ -618,6 +676,12 @@ export default function Profile() {
             </div>
 
             <form onSubmit={handleCreateService} className="p-8 space-y-6">
+              {serviceSubmitError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
+                  {serviceSubmitError}
+                </div>
+              ) : null}
+
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Service Title</label>
@@ -626,7 +690,7 @@ export default function Profile() {
                     value={serviceForm.title}
                     onChange={(e) => setServiceForm({ ...serviceForm, title: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
                     placeholder="e.g. Website Design"
                   />
                 </div>
@@ -636,7 +700,7 @@ export default function Profile() {
                     value={serviceForm.category_id}
                     onChange={(e) => setServiceForm({ ...serviceForm, category_id: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Select Category</option>
                     {categories?.map((cat) => (
@@ -653,8 +717,36 @@ export default function Profile() {
                   onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
                   required
                   rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[#000000] transition-all resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all resize-none"
                   placeholder="Describe your service in detail..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Location (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={serviceForm.location}
+                  onChange={(e) => setServiceForm({ ...serviceForm, location: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
+                  placeholder="e.g. Lagos, Ikeja"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Price (₦) — Leave blank to show "Contact for price"
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={serviceForm.price}
+                  onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all"
+                  placeholder="e.g. 15000"
                 />
               </div>
 
@@ -668,7 +760,7 @@ export default function Profile() {
                     <div className="absolute inset-0">
                       <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Camera size={24} className="text-white" />
+                        <Camera size={24} className="text-[var(--color-text)]" />
                       </div>
                     </div>
                   ) : (
@@ -693,7 +785,7 @@ export default function Profile() {
                 <button
                   type="submit"
                   disabled={serviceMutation.isPending || updateServiceMutation.isPending}
-                  className="w-full py-4 bg-[#000000] text-white font-black rounded-2xl shadow-xl shadow-slate-100 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-black rounded-2xl shadow-xl shadow-slate-100 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
                   {(serviceMutation.isPending || updateServiceMutation.isPending) ? (
                     <Loader2 size={20} className="animate-spin" />
@@ -711,23 +803,3 @@ export default function Profile() {
   );
 }
 
-// Icons for use within return code blocks as components
-function Search(props) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={props.size || 24}
-      height={props.size || 24}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={props.className}
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}

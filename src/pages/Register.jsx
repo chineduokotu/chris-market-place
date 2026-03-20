@@ -54,10 +54,10 @@ export default function Register() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   autoComplete="name"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--color-primary)_16%,white)] transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
                   placeholder="Full Name"
                 />
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--color-text)] transition-colors" size={16} />
               </div>
 
               <div className="relative group">
@@ -67,10 +67,10 @@ export default function Register() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--color-primary)_16%,white)] transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
                   placeholder="Email Address"
                 />
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--color-text)] transition-colors" size={16} />
               </div>
 
               <div className="relative group">
@@ -81,17 +81,17 @@ export default function Register() {
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-black focus:ring-4 focus:ring-black/5 transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[color-mix(in_srgb,var(--color-primary)_16%,white)] transition-all outline-none font-medium text-sm placeholder:text-slate-400 group-hover:bg-slate-100/50"
                   placeholder="Password (min. 8 chars)"
                 />
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-black transition-colors" size={16} />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[var(--color-text)] transition-colors" size={16} />
               </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-black text-white font-bold rounded-xl hover:bg-[#1a1a1a] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm mt-2"
+              className="w-full py-3.5 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm mt-2"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={18} />
@@ -132,3 +132,4 @@ export default function Register() {
     </div>
   );
 }
+

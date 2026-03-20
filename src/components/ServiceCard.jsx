@@ -1,62 +1,137 @@
-import { Link } from 'react-router-dom';
-import { Star, MapPin, ArrowUpRight, Clock, Briefcase } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { BadgeCheck, MapPin, ShieldCheck, User } from "lucide-react";
 
-export default function ServiceCard({ service, variant = 'default' }) {
-  const hasImage = !!service.image;
-  const priceValue = Number(service.price);
-  const hasPrice = Number.isFinite(priceValue) && priceValue > 0;
-  const location = service.location || service.user?.location || 'Remote / Local';
+const priceFormatter = new Intl.NumberFormat("en-NG", {
+  style: "currency",
+  currency: "NGN",
+  currencyDisplay: "narrowSymbol",
+  maximumFractionDigits: 0,
+});
 
-  const isCompact = variant === 'compact';
+export default function ServiceCard({ service }) {
+  const location =
+    service.location ||
+    service.user?.location ||
+    service.provider_location ||
+    "Remote / Local";
+  const imageUrl =
+    service.image || service.image_url || service.thumbnail || null;
+  const hasImage = Boolean(imageUrl);
+  const price = Number(service.price);
+  const showPrice = Number.isFinite(price) && price > 0;
+  const providerName =
+    service.user?.name || service.provider_name || "Service Provider";
+  const description =
+    service.description ||
+    "Professional service listing with quick response and reliable delivery.";
+  const categoryName = service.category?.name || "General Service";
+  const isVerified = Boolean(
+    service.is_verified ||
+    service.verified ||
+    service.user?.is_verified ||
+    service.user?.verified ||
+    service.user?.verification_level === "verified",
+  );
+  const isPromoted = Boolean(
+    service.is_promoted || service.promoted || service.priority === "promoted",
+  );
 
   return (
-    <div className={`group bg-white rounded-lg border border-slate-100 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full cursor-pointer ${isCompact ? 'max-w-[180px]' : ''}`}>
-      {/* Image Section - Jiji Pattern */}
-      <div className={`relative overflow-hidden bg-slate-50 ${isCompact ? 'aspect-square' : 'aspect-[4/3]'}`}>
-        {hasImage ? (
-          <img
-            src={service.image}
-            alt={service.title}
-            loading="lazy"
-            decoding="async"
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-slate-50">
-            <Briefcase size={isCompact ? 24 : 32} className="text-slate-200" />
+    <article className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-[color-mix(in_srgb,var(--color-primary)_35%,white)] bg-white shadow-[0_14px_32px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(37,99,235,0.16)]">
+      <Link to={`/services/${service.id}`} className="block">
+        <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-100">
+          {hasImage ? (
+            <img
+              src={imageUrl}
+              alt={service.title}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(180deg,#dbeafe_0%,#bfdbfe_50%,#eff6ff_100%)] px-4 text-center text-sm font-semibold text-slate-500">
+              No image available
+            </div>
+          )}
+
+          <div className="absolute inset-x-0 top-0 p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="max-w-[70%] rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/90 backdrop-blur-sm">
+                {categoryName}
+              </div>
+              {isVerified ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/92 px-2.5 py-1 text-[10px] font-bold uppercase text-slate-900 shadow-sm">
+                  <ShieldCheck size={10} className="text-sky-600" />
+                  Verified
+                </span>
+              ) : null}
+            </div>
           </div>
-        )}
 
-        {/* Category Badge - Jiji Pattern */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          <span className="text-[9px] font-bold text-white bg-slate-800/80 backdrop-blur-sm px-2 py-1 rounded shadow-sm uppercase tracking-tighter">
-            {service.category?.name || 'Service'}
-          </span>
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent p-3 pt-10">
+            <p className="line-clamp-1 text-[11px] font-semibold text-white/85">
+              {providerName}
+            </p>
+            <h3 className="line-clamp-2 text-sm font-extrabold leading-5 text-white drop-shadow-sm sm:text-base">
+              {service.title}
+            </h3>
+          </div>
+
+          <div className="absolute left-3 top-14 inline-flex items-center gap-1">
+            {isPromoted ? (
+              <span className=" bg-amber-400 px-2 py-1 text-[10px] font-bold uppercase text-slate-900 shadow-sm">
+                Promoted
+              </span>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </Link>
 
-      {/* Content Section */}
-      <div className={`${isCompact ? 'p-2' : 'p-3'} flex flex-col flex-1`}>
-        {/* Title */}
+      <div className="flex flex-1 flex-col gap-2.5 p-2.5 sm:p-3">
+        <p className="text-[15px] font-black leading-none text-emerald-600 sm:text-lg">
+          {showPrice ? priceFormatter.format(price) : "Contact for price"}
+        </p>
+
         <Link to={`/services/${service.id}`}>
-          <h3 className={`${isCompact ? 'text-[11px]' : 'text-sm'} font-semibold text-slate-800 hover:text-black transition-colors line-clamp-2 mb-1 leading-tight`}>
+          <h3 className="line-clamp-2 text-[15px] font-extrabold leading-6 text-slate-900 transition-colors group-hover:text-[var(--color-primary)]">
             {service.title}
           </h3>
         </Link>
 
-        {/* Call to Action - Jiji Green */}
-        <div className={`${isCompact ? 'text-[10px]' : 'text-xs'} font-black text-black mt-1.5 uppercase tracking-wider`}>
-          Request Service!
+        <p className="line-clamp-3 text-sm leading-6 text-slate-500">
+          {description}
+        </p>
+
+        <div className="mt-auto flex items-end justify-between gap-2 pt-0.5">
+          <p className="line-clamp-2 inline-flex flex-1 items-center gap-1.5 text-xs font-semibold text-slate-500">
+            <MapPin size={13} className="shrink-0" />
+            <span>{location}</span>
+          </p>
+
+          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[var(--color-primary-soft)] text-slate-400">
+            {isVerified ? <BadgeCheck size={15} className="text-emerald-500" /> : <User size={15} />}
+          </span>
         </div>
 
-        {/* Location & Meta */}
-        <div className="mt-auto pt-2 flex items-center justify-between text-[10px] text-slate-500 font-medium">
-          <div className="flex items-center gap-1">
-            <MapPin size={isCompact ? 10 : 12} />
-            <span className="line-clamp-1">{location}</span>
-          </div>
+        <div className="flex items-center justify-between border-t border-slate-100 pt-2">
+          <span className="line-clamp-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+            {categoryName}
+          </span>
+
+          <span
+            className={`inline-flex items-center gap-1 text-[11px] font-semibold ${isVerified ? "text-emerald-600" : "text-slate-400"}`}
+          >
+            {isVerified ? (
+              <>
+                <BadgeCheck size={12} />
+                Verified
+              </>
+            ) : (
+              "Profile"
+            )}
+          </span>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

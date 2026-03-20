@@ -86,11 +86,11 @@ export default function ChatWidget() {
         return (
             <button
                 onClick={() => openChat()}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-105 flex items-center justify-center z-50"
+                className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-[var(--color-text)] rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-105 flex items-center justify-center z-50"
             >
                 <MessageCircle size={24} />
                 {unreadTotal > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-[var(--color-text)] text-xs font-bold rounded-full flex items-center justify-center">
                         {unreadTotal > 9 ? '9+' : unreadTotal}
                     </span>
                 )}
@@ -101,7 +101,7 @@ export default function ChatWidget() {
     return (
         <div className="fixed bottom-6 right-6 w-96 h-[32rem] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-200 overflow-hidden">
             {/* Header */}
-            <div className="bg-blue-600 text-white px-4 py-3 flex items-center gap-3">
+            <div className="bg-blue-600 text-[var(--color-text)] px-4 py-3 flex items-center gap-3">
                 {activeConversation && (
                     <button onClick={backToList} className="hover:bg-blue-700 p-1 rounded">
                         <ArrowLeft size={20} />
@@ -154,7 +154,7 @@ export default function ChatWidget() {
                                             <div
                                                 className={`max-w-[75%] px-4 py-2 rounded-2xl ${
                                                     isOwn
-                                                        ? 'bg-blue-600 text-white rounded-br-sm'
+                                                        ? 'bg-blue-600 text-[var(--color-text)] rounded-br-sm'
                                                         : 'bg-slate-100 text-slate-800 rounded-bl-sm'
                                                 }`}
                                             >
@@ -212,7 +212,7 @@ export default function ChatWidget() {
                                                 {conv.last_message?.body || 'No messages yet'}
                                             </p>
                                             {conv.unread_count > 0 && (
-                                                <span className="w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center shrink-0 ml-2">
+                                                <span className="w-5 h-5 bg-blue-600 text-[var(--color-text)] text-xs font-bold rounded-full flex items-center justify-center shrink-0 ml-2">
                                                     {conv.unread_count}
                                                 </span>
                                             )}
@@ -241,7 +241,7 @@ export default function ChatWidget() {
                         <button
                             type="submit"
                             disabled={!newMessage.trim() || isSending}
-                            className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-10 h-10 bg-blue-600 text-[var(--color-text)] rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Send size={18} />
                         </button>
@@ -251,3 +251,4 @@ export default function ChatWidget() {
         </div>
     );
 }
+
