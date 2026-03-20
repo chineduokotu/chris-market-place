@@ -663,8 +663,8 @@ export default function Profile() {
       {/* Jiji Style Service Modal */}
       {showServiceForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300">
-            <div className="px-8 py-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <div className="bg-white w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300">
+            <div className="shrink-0 px-8 py-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <h2 className="text-xl font-black text-slate-900 tracking-tight">{editingService ? 'Update your service' : 'Add new service'}</h2>
               <button
                 onClick={handleCancelEdit}
@@ -675,7 +675,7 @@ export default function Profile() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateService} className="p-8 space-y-6">
+            <form onSubmit={handleCreateService} className="overflow-y-auto p-8 space-y-6">
               {serviceSubmitError ? (
                 <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
                   {serviceSubmitError}
