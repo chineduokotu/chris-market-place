@@ -1,6 +1,6 @@
 import axios from "axios";
 const prod_url = "https://chris-market-place-server.onrender.com";
-const dev_url = "http://localhost:8000";
+const dev_url = "http://127.0.0.1:8000";
 
 const resolvedBaseUrl =
   import.meta.env.VITE_API_URL ||

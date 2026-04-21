@@ -5,7 +5,7 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 const prodApiUrl = 'https://chris-market-place-server.onrender.com/api';
-const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000/api' : prodApiUrl);
+const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8000/api' : prodApiUrl);
 const apiBaseUrl = apiUrl.replace(/\/api\/?$/, '');
 const apiHost = new URL(apiBaseUrl).hostname;
 const apiProtocol = new URL(apiBaseUrl).protocol.replace(':', '');

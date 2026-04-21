@@ -21,7 +21,7 @@ export function ChatProvider({ children }) {
         if (!storedUser) return null;
         try {
             return JSON.parse(storedUser).id;
-        } catch (error) {
+        } catch {
             return null;
         }
     };
@@ -83,7 +83,7 @@ export function ChatProvider({ children }) {
         } finally {
             setIsLoading(false);
         }
-    }, [fetchConversations]);
+    }, [fetchConversations, setMessagesWithIds]);
 
     // Start or get existing conversation with a user
     const startConversation = useCallback(async (userId, bookingId = null) => {
@@ -118,7 +118,7 @@ export function ChatProvider({ children }) {
             console.error('Failed to send message:', error);
             throw error;
         }
-    }, [activeConversation, fetchConversations]);
+    }, [activeConversation, fetchConversations, addMessage]);
 
     const sendTyping = useCallback((conversationId) => {
         const channel = echo.private(`conversation.${conversationId}`);
@@ -154,7 +154,7 @@ export function ChatProvider({ children }) {
         setTypingUsers({});
         typingTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
         typingTimeoutsRef.current.clear();
-    }, []);
+    }, [setMessagesWithIds]);
 
     // Go back to conversation list
     const backToList = useCallback(() => {
@@ -163,7 +163,7 @@ export function ChatProvider({ children }) {
         setTypingUsers({});
         typingTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
         typingTimeoutsRef.current.clear();
-    }, []);
+    }, [setMessagesWithIds]);
 
     // Subscribe to real-time updates when conversation is active
     useEffect(() => {
@@ -191,11 +191,13 @@ export function ChatProvider({ children }) {
             }
         });
 
+        const timeouts = typingTimeoutsRef.current;
         return () => {
             echo.leave(`conversation.${activeConversation.id}`);
             setTypingUsers({});
-            typingTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId));
-            typingTimeoutsRef.current.clear();
+
+            timeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+            timeouts.clear();
         };
     }, [activeConversation, addMessage, fetchConversations, setUserTyping]);
 
@@ -270,6 +272,7 @@ export function ChatProvider({ children }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useChat() {
     const context = useContext(ChatContext);
     if (!context) {

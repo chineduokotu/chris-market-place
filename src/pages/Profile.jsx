@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import BookingCard from '../components/BookingCard';
+import { groupCategories } from '../lib/category';
 import {
   User, Phone, MessageSquare, Save, CheckCircle, AlertCircle, Loader2,
   Settings, Briefcase, Plus, X, LayoutDashboard, Calendar, PlusCircle,
@@ -72,6 +73,8 @@ export default function Profile() {
     },
     enabled: !!user,
   });
+
+  const groupedCategories = useMemo(() => groupCategories(categories), [categories]);
 
   const { data: bookings, isLoading: bookingsLoading } = useQuery({
     queryKey: [isProvider ? 'my-jobs' : 'my-requests'],
@@ -206,7 +209,7 @@ export default function Profile() {
     try {
       const updatedUser = await switchRole();
       return updatedUser?.current_role === 'provider';
-    } catch (error) {
+    } catch {
       return false;
     } finally {
       setIsSwitchingRole(false);
@@ -333,10 +336,10 @@ export default function Profile() {
             </div>
 
             {/* Jiji Advice Card */}
-            <div className="bg-[var(--color-primary)] rounded-2xl p-4 text-[var(--color-text)] shadow-sm overflow-hidden relative">
+            <div className="bg-[#0a2e5c] rounded-2xl p-4 text-white shadow-sm overflow-hidden relative">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded">Advice</span>
-                <span className="text-[10px] opacity-70">hide 2</span>
+                <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded text-white">Advice</span>
+                <span className="text-[10px] text-white/70">hide 2</span>
               </div>
               <ul className="space-y-3">
                 <li className="flex gap-2 text-xs font-bold items-start group">
@@ -368,10 +371,10 @@ export default function Profile() {
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon size={18} className={activeTab === item.id ? 'text-[var(--color-text)]' : 'text-slate-500 grouplaceholder:text-slate-500'} />
+                    <item.icon size={18} className={activeTab === item.id ? 'text-[#0a2e5c]' : 'text-slate-500'} />
                     <span className="text-sm font-bold">{item.label}</span>
                     {item.count && (
-                      <span className={`ml-1 text-[10px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full ${activeTab === item.id ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : ''}`}>
+                      <span className={`ml-1 text-[10px] font-black bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full ${activeTab === item.id ? 'bg-[#0a2e5c] text-white' : ''}`}>
                         {item.count}
                       </span>
                     )}
@@ -407,7 +410,7 @@ export default function Profile() {
                       }
                     }}
                     disabled={isSwitchingRole}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] transition-all shadow-lg shadow-slate-100 active:scale-95 uppercase tracking-wider text-xs"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-[#0a2e5c] text-white font-bold rounded-xl hover:bg-[#061d3b] transition-all shadow-lg shadow-slate-100 active:scale-95 uppercase tracking-wider text-xs"
                   >
                     {isSwitchingRole ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
                     <span>{isProvider ? 'Add New Service' : 'Enable Provider Mode'}</span>
@@ -457,7 +460,7 @@ export default function Profile() {
                           }
                         }}
                         disabled={isSwitchingRole}
-                        className="px-8 py-3 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl shadow-lg shadow-emerald-200 uppercase tracking-wider text-xs"
+                        className="px-8 py-3 bg-[#0a2e5c] text-white font-bold rounded-xl shadow-lg shadow-blue-100 uppercase tracking-wider text-xs"
                       >
                         {isSwitchingRole ? 'Switching to provider...' : (isProvider ? 'Publish your first service' : 'Become a provider to post')}
                       </button>
@@ -499,7 +502,7 @@ export default function Profile() {
                               <User size={12} className="text-black" />
                               <span>0 visitors</span>
                             </div>
-                            <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1">
                               <Phone size={12} className="text-orange-500" />
                               <span>0 phone views</span>
                             </div>
@@ -635,7 +638,7 @@ export default function Profile() {
                       <button
                         type="submit"
                         disabled={profileMutation.isPending}
-                        className="px-10 py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-black rounded-2xl shadow-lg shadow-emerald-200 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
+                        className="px-10 py-4 bg-[#0a2e5c] text-white font-black rounded-2xl shadow-lg shadow-blue-100 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
                       >
                         {profileMutation.isPending ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
                         Save Changes
@@ -703,8 +706,14 @@ export default function Profile() {
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-slate-900 focus:bg-white focus:border-[var(--color-border)] transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Select Category</option>
-                    {categories?.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    {Object.entries(groupedCategories).map(([group, list]) => (
+                      <optgroup key={group} label={group}>
+                        {list.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.icon} {cat.name}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                 </div>
@@ -737,7 +746,7 @@ export default function Profile() {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                  Price (₦) — Leave blank to show "Contact for price"
+                  Price ($) — Leave blank to show "Quote"
                 </label>
                 <input
                   type="number"
@@ -760,7 +769,7 @@ export default function Profile() {
                     <div className="absolute inset-0">
                       <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Camera size={24} className="text-[var(--color-text)]" />
+                        <Camera size={24} className="text-white" />
                       </div>
                     </div>
                   ) : (
@@ -785,7 +794,7 @@ export default function Profile() {
                 <button
                   type="submit"
                   disabled={serviceMutation.isPending || updateServiceMutation.isPending}
-                  className="w-full py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-black rounded-2xl shadow-xl shadow-slate-100 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-4 bg-[#0a2e5c] text-white font-black rounded-2xl shadow-xl shadow-slate-100 uppercase tracking-widest text-xs active:scale-95 transition-all flex items-center justify-center gap-3"
                 >
                   {(serviceMutation.isPending || updateServiceMutation.isPending) ? (
                     <Loader2 size={20} className="animate-spin" />

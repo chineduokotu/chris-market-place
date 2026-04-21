@@ -86,22 +86,25 @@ export default function ChatWidget() {
         return (
             <button
                 onClick={() => openChat()}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-[var(--color-text)] rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-105 flex items-center justify-center z-50"
+                className="fixed bottom-24 right-8 w-16 h-16 bg-[#0a2e5c] text-white rounded-full shadow-2xl hover:bg-[#061d3b] transition-all hover:scale-110 active:scale-95 flex items-center justify-center z-50 group"
+                aria-label="Open messages"
             >
-                <MessageCircle size={24} />
-                {unreadTotal > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-[var(--color-text)] text-xs font-bold rounded-full flex items-center justify-center">
-                        {unreadTotal > 9 ? '9+' : unreadTotal}
-                    </span>
-                )}
+                <div className="relative">
+                    <MessageCircle size={32} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
+                    {unreadTotal > 0 && (
+                        <span className="absolute -top-3 -right-3 min-w-[22px] h-[22px] px-1 bg-red-500 text-white text-[11px] font-black rounded-full border-2 border-[#0a2e5c] flex items-center justify-center shadow-lg">
+                            {unreadTotal > 9 ? '9+' : unreadTotal}
+                        </span>
+                    )}
+                </div>
             </button>
         );
     }
 
     return (
-        <div className="fixed bottom-6 right-6 w-96 h-[32rem] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-slate-200 overflow-hidden">
+        <div className="fixed bottom-24 right-8 w-96 h-[32rem] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] flex flex-col z-[60] border border-slate-100 overflow-hidden">
             {/* Header */}
-            <div className="bg-blue-600 text-[var(--color-text)] px-4 py-3 flex items-center gap-3">
+            <div className="bg-[#0a2e5c] text-white px-5 py-4 flex items-center gap-3">
                 {activeConversation && (
                     <button onClick={backToList} className="hover:bg-blue-700 p-1 rounded">
                         <ArrowLeft size={20} />
@@ -154,20 +157,20 @@ export default function ChatWidget() {
                                             <div
                                                 className={`max-w-[75%] px-4 py-2 rounded-2xl ${
                                                     isOwn
-                                                        ? 'bg-blue-600 text-[var(--color-text)] rounded-br-sm'
+                                                        ? 'bg-[#0a2e5c] text-white rounded-br-sm'
                                                         : 'bg-slate-100 text-slate-800 rounded-bl-sm'
                                                 }`}
                                             >
                                                 <p className="text-sm break-words">{msg.body}</p>
                                                 <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : ''}`}>
-                                                    <span className={`text-xs ${isOwn ? 'text-blue-200' : 'text-slate-400'}`}>
+                                                    <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-slate-400'}`}>
                                                         {formatTime(msg.created_at)}
                                                     </span>
                                                     {isOwn && (
                                                         msg.read_at ? (
-                                                            <CheckCheck size={14} className="text-blue-200" />
+                                                            <CheckCheck size={14} className="text-white/80" />
                                                         ) : (
-                                                            <Check size={14} className="text-blue-300" />
+                                                            <Check size={14} className="text-white/60" />
                                                         )
                                                     )}
                                                 </div>
@@ -193,7 +196,7 @@ export default function ChatWidget() {
                                     onClick={() => fetchMessages(conv.id)}
                                     className="w-full p-4 text-left hover:bg-slate-50 transition-colors flex items-start gap-3"
                                 >
-                                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-semibold shrink-0">
+                                    <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-[#0a2e5c] font-semibold shrink-0">
                                         {conv.other_user?.name?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -212,7 +215,7 @@ export default function ChatWidget() {
                                                 {conv.last_message?.body || 'No messages yet'}
                                             </p>
                                             {conv.unread_count > 0 && (
-                                                <span className="w-5 h-5 bg-blue-600 text-[var(--color-text)] text-xs font-bold rounded-full flex items-center justify-center shrink-0 ml-2">
+                                                <span className="w-5 h-5 bg-[#0a2e5c] text-white text-xs font-bold rounded-full flex items-center justify-center shrink-0 ml-2">
                                                     {conv.unread_count}
                                                 </span>
                                             )}
@@ -241,7 +244,7 @@ export default function ChatWidget() {
                         <button
                             type="submit"
                             disabled={!newMessage.trim() || isSending}
-                            className="w-10 h-10 bg-blue-600 text-[var(--color-text)] rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-10 h-10 bg-[#0a2e5c] text-white rounded-full flex items-center justify-center hover:bg-[#061d3b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Send size={18} />
                         </button>

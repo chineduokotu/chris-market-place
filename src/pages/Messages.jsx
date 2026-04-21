@@ -10,8 +10,6 @@ export default function Messages() {
         conversations,
         activeConversation,
         messages,
-        isLoading,
-        connectionStatus,
         fetchMessages,
         sendMessage,
         backToList,

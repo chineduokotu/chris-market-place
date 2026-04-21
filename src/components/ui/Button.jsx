@@ -3,13 +3,13 @@ import { cn } from '../../lib/cn';
 
 const variantClasses = {
   primary:
-    'bg-[var(--color-primary)] text-[var(--color-text)] border-transparent hover:bg-[var(--color-primary-strong)] shadow-[0_10px_24px_rgba(37,99,235,0.22)]',
+    'bg-[var(--color-primary)] text-white border-transparent hover:bg-[var(--color-primary-strong)] shadow-[0_10px_24px_rgba(37,99,235,0.22)]',
   secondary:
     'bg-white text-[var(--color-text)] border-[var(--color-border)] hover:border-[color-mix(in_srgb,var(--color-primary)_35%,white)] hover:bg-[var(--color-primary-soft)]',
   ghost:
     'bg-transparent text-[var(--color-muted)] border-transparent hover:bg-[var(--color-primary-soft)] hover:text-[var(--color-text)]',
   destructive:
-    'bg-[var(--color-error)] text-[var(--color-text)] border-transparent hover:bg-[var(--color-primary-strong)]',
+    'bg-[var(--color-error)] text-white border-transparent hover:bg-[var(--color-primary-strong)]',
 };
 
 const sizeClasses = {

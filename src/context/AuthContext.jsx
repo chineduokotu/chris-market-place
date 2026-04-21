@@ -5,16 +5,20 @@ import { updateEchoAuth } from '../lib/echo';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    return (token && storedUser) ? JSON.parse(storedUser) : null;
+  });
+  const [loading] = useState(false);
+
+  useEffect(() => {
+    // State initialization moved to useState
+
+
+
+
+
   }, []);
 
   const login = async (email, password) => {
@@ -40,7 +44,8 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await api.post('/logout');
-    } catch (error) {
+    } catch {
+      // Ignored
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -69,6 +74,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

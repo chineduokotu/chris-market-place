@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, MapPin, Layers, Plus } from 'lucide-react';
 import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import Drawer from '../components/ui/Drawer';
 import ServiceGrid from '../components/ServiceGrid';
 import { setMeta } from '../lib/seo';
+import { groupCategories } from '../lib/category';
 
 const SORT_OPTIONS = [
   { value: 'recent', label: 'Most Recent' },
@@ -118,6 +119,8 @@ export default function HomePage() {
 
   const {
     data: categoriesPayload,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
   } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
@@ -142,6 +145,7 @@ export default function HomePage() {
   });
 
   const categories = useMemo(() => normalizeList(categoriesPayload), [categoriesPayload]);
+  const groupedCategories = useMemo(() => groupCategories(categories), [categories]);
   const services = useMemo(() => normalizeList(servicesPayload), [servicesPayload]);
   const pagination = useMemo(
     () => extractPagination(servicesPayload, page, services.length, perPage),
@@ -210,7 +214,7 @@ export default function HomePage() {
                 />
                 <button
                   type="submit"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md bg-[var(--color-primary)] px-3 py-1.5 text-xs font-bold text-[var(--color-text)] hover:bg-[var(--color-primary-strong)]"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md bg-[#0a2e5c] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#061d3b]"
                 >
                   Search
                 </button>
@@ -226,7 +230,7 @@ export default function HomePage() {
               </Link>
               <Link
                 to={user ? '/dashboard' : '/register'}
-                className="rounded-lg bg-[var(--color-primary)] px-3 py-2 text-xs font-bold text-[var(--color-text)] hover:bg-[var(--color-primary-strong)] sm:text-sm"
+                className="rounded-lg bg-[#0a2e5c] px-3 py-2 text-xs font-bold !text-white hover:bg-[#061d3b] sm:text-sm"
               >
                 Post a Service
               </Link>
@@ -249,120 +253,150 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className="container-app py-3">
-        <div className="mb-3 rounded-xl border border-[var(--color-border)] bg-white p-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              value={sort}
-              onChange={(event) => updateParams({ sort: event.target.value })}
-              className="h-9 rounded-lg border border-[var(--color-border)] bg-white px-2 text-xs font-semibold text-slate-700 outline-none sm:text-sm"
-              aria-label="Sort services"
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+      <div className="container-app py-6">
+        {/* New Hero Section */}
+        <section className="relative overflow-hidden rounded-[2.5rem] bg-[var(--color-primary-soft)] px-6 py-16 md:px-12 md:py-20 mb-8">
+          <div className="relative z-10 max-w-2xl">
+            <h1 className="text-4xl md:text-5xl font-black text-[#1e293b] leading-[1.1] mb-8 tracking-tight">
+              Find the perfect expert for any task.
+            </h1>
 
-            <div className="flex h-9 flex-1 min-w-44 items-center rounded-lg border border-[var(--color-border)] bg-white px-2">
-              <input
-                type="text"
-                value={locationInput}
-                onChange={(event) => setLocationInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    applyLocationFilter();
-                  }
-                }}
-                onBlur={applyLocationFilter}
-                placeholder="Location"
-                className="w-full bg-transparent text-xs font-semibold text-slate-700 outline-none sm:text-sm"
-                aria-label="Filter by location"
-              />
+            <div className="space-y-6">
+              {/* Search Bar */}
+              <form onSubmit={onSubmitSearch} className="relative group">
+                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0a2e5c] transition-colors">
+                  <Search size={20} />
+                </div>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="What service do you need today?"
+                  className="w-full h-16 pl-14 pr-32 bg-white rounded-2xl shadow-sm border border-transparent focus:border-[#0a2e5c] focus:ring-4 focus:ring-blue-50 outline-none text-[15px] font-bold text-slate-700 transition-all"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-2 bottom-2 px-8 bg-[#0a2e5c] text-white font-black rounded-xl hover:bg-[#061d3b] transition-colors"
+                >
+                  Search
+                </button>
+              </form>
+
+              {/* Pill Filters */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative">
+                  <select
+                    value={sort}
+                    onChange={(e) => updateParams({ sort: e.target.value })}
+                    className="appearance-none h-11 pl-4 pr-10 bg-white border border-slate-100 rounded-full text-[13px] font-black text-slate-600 outline-none cursor-pointer hover:border-[#0a2e5c] transition-all"
+                  >
+                    {SORT_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <Filter size={14} />
+                  </div>
+                </div>
+
+                <div className="relative flex-1 min-w-[140px] max-w-[180px]">
+                  <MapPin size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                    onBlur={applyLocationFilter}
+                    placeholder="Location"
+                    className="w-full h-11 pl-10 pr-4 bg-white border border-slate-100 rounded-full text-[13px] font-black text-slate-700 outline-none focus:border-[#0a2e5c] transition-all"
+                  />
+                </div>
+
+                <div className="relative flex-1 min-w-[160px] max-w-[220px]">
+                  <Layers size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold" />
+                  <select
+                    value={category}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
+                    disabled={categoriesLoading || categoriesError}
+                    className="appearance-none w-full h-11 pl-10 pr-4 bg-white border border-slate-100 rounded-full text-[13px] font-black text-slate-600 outline-none cursor-pointer hover:border-[#0a2e5c] transition-all"
+                  >
+                    <option value="">
+                      {categoriesLoading
+                        ? 'Loading categories...'
+                        : categoriesError
+                          ? 'Unable to load categories'
+                          : 'All Categories'}
+                    </option>
+                    {!categoriesLoading && !categoriesError && categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-3 ml-2">
+                  <span className="text-[13px] font-black text-slate-500">Verified only</span>
+                  <button
+                    type="button"
+                    onClick={() => updateParams({ verified: !verified ? '1' : '' })}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${verified ? 'bg-[#0a2e5c]' : 'bg-slate-300'}`}
+                  >
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${verified ? 'left-7' : 'left-1'}`} />
+                  </button>
+                </div>
+              </div>
             </div>
-
-            <select
-              value={category}
-              onChange={(event) => handleCategoryChange(event.target.value)}
-              className="h-9 min-w-40 flex-1 rounded-lg border border-[var(--color-border)] bg-white px-2 text-xs font-semibold text-slate-700 outline-none md:max-w-56 md:flex-none"
-              aria-label="Filter by category"
-            >
-              <option value="">All Categories</option>
-              {categories.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-
-            <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 text-xs font-bold text-slate-700 sm:text-sm">
-              <input
-                type="checkbox"
-                checked={verified}
-                onChange={(event) => updateParams({ verified: event.target.checked ? '1' : '' })}
-                className="h-4 w-4 accent-[var(--color-primary)]"
-              />
-              Verified only
-            </label>
-
-            <button
-              type="button"
-              className="ml-auto inline-flex h-9 items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 text-xs font-bold text-slate-700 hover:bg-slate-100 md:hidden sm:text-sm"
-              onClick={() => setIsFilterDrawerOpen(true)}
-            >
-              <Filter size={14} />
-              Filters
-            </button>
           </div>
-        </div>
+        </section>
 
+
+
+        {/* Services Section */}
         <section>
           <ServiceGrid
             services={services}
             isLoading={servicesLoading}
-            isFetching={servicesFetching}
             isError={servicesError}
+            isFetching={servicesFetching}
             onClearFilters={clearAllFilters}
           />
 
           {pagination.lastPage > 1 ? (
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--color-border)] bg-white p-3">
-              <p className="text-xs font-semibold text-slate-500">
-                Showing {pagination.from}-{pagination.to} of {pagination.total}
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+              <p className="text-sm font-bold text-slate-400">
+                Showing <span className="text-[#1e293b]">{pagination.from}-{pagination.to}</span> of <span className="text-[#1e293b]">{pagination.total}</span> listings
               </p>
 
-              <div className="inline-flex items-center gap-1">
+              <div className="inline-flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => changePage(pagination.currentPage - 1)}
                   disabled={pagination.currentPage <= 1}
-                  className="h-8 rounded-md border border-[var(--color-border)] px-2 text-xs font-bold text-slate-700 disabled:opacity-40"
+                  className="h-10 px-4 rounded-xl border border-slate-100 text-[13px] font-black text-slate-700 disabled:opacity-30 hover:bg-slate-50 transition-colors"
                 >
-                  Prev
+                  Previous
                 </button>
 
-                {visiblePages.map((pageNumber) => (
-                  <button
-                    key={pageNumber}
-                    type="button"
-                    onClick={() => changePage(pageNumber)}
-                    className={`h-8 min-w-8 rounded-md border px-2 text-xs font-bold ${
-                      pageNumber === pagination.currentPage
-                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-text)]'
-                        : 'border-[var(--color-border)] bg-white text-slate-700'
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                ))}
+                <div className="flex items-center gap-1">
+                  {visiblePages.map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      onClick={() => changePage(pageNumber)}
+                      className={`h-10 min-w-[40px] rounded-xl text-[13px] font-black transition-all ${
+                        pageNumber === pagination.currentPage
+                          ? 'bg-[#0a2e5c] text-white shadow-lg shadow-blue-100'
+                          : 'text-slate-500 hover:bg-slate-50'
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                </div>
 
                 <button
                   type="button"
                   onClick={() => changePage(pagination.currentPage + 1)}
                   disabled={pagination.currentPage >= pagination.lastPage}
-                  className="h-8 rounded-md border border-[var(--color-border)] px-2 text-xs font-bold text-slate-700 disabled:opacity-40"
+                  className="h-10 px-4 rounded-xl border border-slate-100 text-[13px] font-black text-slate-700 disabled:opacity-30 hover:bg-slate-50 transition-colors"
                 >
                   Next
                 </button>
@@ -371,91 +405,6 @@ export default function HomePage() {
           ) : null}
         </section>
       </div>
-
-      <Drawer isOpen={isFilterDrawerOpen} onClose={() => setIsFilterDrawerOpen(false)} title="Filters">
-        <div className="space-y-3">
-          <div>
-            <label htmlFor="mobile-sort" className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">
-              Sort
-            </label>
-            <select
-              id="mobile-sort"
-              value={sort}
-              onChange={(event) => updateParams({ sort: event.target.value })}
-              className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-slate-700"
-            >
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="mobile-category" className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">
-              Category
-            </label>
-            <select
-              id="mobile-category"
-              value={category}
-              onChange={(event) => handleCategoryChange(event.target.value)}
-              className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-slate-700"
-            >
-              <option value="">All Categories</option>
-              {categories.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="mobile-location" className="mb-1 block text-xs font-bold uppercase tracking-wide text-slate-500">
-              Location
-            </label>
-            <input
-              id="mobile-location"
-              type="text"
-              value={locationInput}
-              onChange={(event) => setLocationInput(event.target.value)}
-              onBlur={applyLocationFilter}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  applyLocationFilter();
-                }
-              }}
-              className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-slate-700"
-              placeholder="Enter location"
-            />
-          </div>
-
-          <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm font-semibold text-slate-700">
-            <input
-              type="checkbox"
-              checked={verified}
-              onChange={(event) => updateParams({ verified: event.target.checked ? '1' : '' })}
-              className="h-4 w-4 accent-[var(--color-primary)]"
-            />
-            Verified only
-          </label>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                clearAllFilters();
-                setIsFilterDrawerOpen(false);
-              }}
-              className="col-span-2 h-10 rounded-lg border border-[var(--color-border)] text-sm font-bold text-slate-700"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      </Drawer>
     </div>
   );
 }
