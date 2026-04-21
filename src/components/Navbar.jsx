@@ -51,7 +51,7 @@ export default function Navbar() {
 
             <Link to="/" className="flex items-center gap-2.5" aria-label="ChrisHub homepage">
               <div
-                className="flex h-9 w-9 items-center justify-center rounded-[10px] text-sm font-extrabold text-[var(--color-text)]"
+                className="flex h-9 w-9 items-center justify-center rounded-[10px] text-sm font-extrabold text-white"
                 style={{ background: 'var(--color-primary-gradient)' }}
                 aria-hidden
               >
@@ -89,7 +89,7 @@ export default function Navbar() {
                 >
                   <MessageSquare size={18} />
                   {unreadTotal > 0 ? (
-                    <span className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-primary)] px-1 text-[10px] font-bold text-[var(--color-text)]">
+                    <span className="absolute right-1 top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-primary)] px-1 text-[10px] font-bold text-white">
                       {unreadTotal > 9 ? '9+' : unreadTotal}
                     </span>
                   ) : null}

@@ -79,7 +79,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
+              className="w-full py-3.5 bg-[var(--color-primary)] text-white font-bold rounded-xl hover:bg-[var(--color-primary-strong)] disabled:opacity-70 transition-all shadow-lg shadow-slate-200 active:scale-[0.98] flex items-center justify-center gap-2 text-sm"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={18} />

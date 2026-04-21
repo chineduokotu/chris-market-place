@@ -52,7 +52,7 @@ export default function ProviderProfile() {
   return (
     <div className="bg-slate-50 min-h-screen pb-16">
       {/* Header */}
-      <section className="relative bg-[var(--color-primary)] text-[var(--color-text)]">
+      <section className="relative bg-[var(--color-primary)] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <button
             type="button"
@@ -166,7 +166,7 @@ export default function ProviderProfile() {
             <h3 className="text-lg font-bold text-slate-900 mb-4">Quick actions</h3>
             <Link
               to={services[0] ? `/services/${services[0].id}` : '/services'}
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-xl hover:bg-[var(--color-primary-strong)] transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[var(--color-primary)] text-white font-bold rounded-xl hover:bg-[var(--color-primary-strong)] transition-colors"
             >
               Request Service
               <ArrowRight size={18} />

@@ -45,7 +45,7 @@ export default function BottomNav() {
                 <item.icon size={18} />
                 <span>{item.name}</span>
                 {item.badge > 0 ? (
-                  <span className="absolute right-5 top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-primary)] px-1 text-[10px] font-bold text-[var(--color-text)]">
+                  <span className="absolute right-5 top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-primary)] px-1 text-[10px] font-bold text-white">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>
                 ) : null}

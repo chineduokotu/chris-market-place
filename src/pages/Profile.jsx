@@ -317,9 +317,9 @@ export default function Profile() {
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
                   {profileMutation.isPending ? (
-                    <Loader2 size={24} className="text-[var(--color-text)] animate-spin" />
+                    <Loader2 size={24} className="text-white animate-spin" />
                   ) : (
-                    <ImagePlus size={24} className="text-[var(--color-text)]" />
+                    <ImagePlus size={24} className="text-white" />
                   )}
                 </div>
                 <input
@@ -476,7 +476,7 @@ export default function Profile() {
                               <ImagePlus size={32} />
                             </div>
                           )}
-                          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-[var(--color-text)] text-[10px] font-black px-1.5 py-0.5 rounded flex items-center gap-1">
+                          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-black px-1.5 py-0.5 rounded flex items-center gap-1">
                             <Camera size={10} />
                             <span>1</span>
                           </div>
@@ -581,7 +581,7 @@ export default function Profile() {
                     <p className="text-slate-500 text-sm font-medium">Update your public profile and contact info</p>
                   </div>
                   {profileMutation.isSuccess && (
-                    <div className="bg-slate-50 text-[var(--color-text)] text-xs font-black px-4 py-2 rounded-xl flex items-center gap-2 animate-bounce">
+                    <div className="bg-slate-50 text-emerald-700 text-xs font-black px-4 py-2 rounded-xl flex items-center gap-2 animate-bounce">
                       <CheckCircle2 size={16} />
                       Saved!
                     </div>

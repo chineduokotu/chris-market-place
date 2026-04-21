@@ -193,7 +193,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             <Link to="/" className="inline-flex shrink-0 items-center gap-2" aria-label="ChrisHub homepage">
               <div
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-[var(--color-text)]"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-extrabold text-white"
                 style={{ background: 'var(--color-primary-gradient)' }}
               >
                 C

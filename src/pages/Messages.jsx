@@ -111,13 +111,13 @@ export default function Messages() {
                         <div className="flex gap-2 mt-4">
                             <button
                                 onClick={() => setFilterType('all')}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'all' ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : 'text-slate-500 hover:bg-slate-100'}`}
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'all' ? 'bg-[var(--color-primary)] text-white' : 'text-slate-500 hover:bg-slate-100'}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setFilterType('unread')}
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'unread' ? 'bg-[var(--color-primary)] text-[var(--color-text)]' : 'text-slate-500 hover:bg-slate-100'}`}
+                                className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${filterType === 'unread' ? 'bg-[var(--color-primary)] text-white' : 'text-slate-500 hover:bg-slate-100'}`}
                             >
                                 Unread
                             </button>
@@ -159,7 +159,7 @@ export default function Messages() {
                                                 {conv.last_message?.body || 'No messages yet'}
                                             </p>
                                             {conv.unread_count > 0 && (
-                                                <span className="w-5 h-5 bg-[var(--color-primary)] text-[var(--color-text)] text-[10px] font-black rounded-full flex items-center justify-center shrink-0 ml-2 shadow-sm shadow-slate-100">
+                                                <span className="w-5 h-5 bg-[var(--color-primary)] text-white text-[10px] font-black rounded-full flex items-center justify-center shrink-0 ml-2 shadow-sm shadow-slate-100">
                                                     {conv.unread_count}
                                                 </span>
                                             )}
@@ -185,7 +185,7 @@ export default function Messages() {
                                     >
                                         <ArrowLeft size={24} />
                                     </button>
-                                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-[var(--color-text)] font-bold text-sm shadow-lg shadow-slate-200 uppercase">
+                                    <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-slate-200 uppercase">
                                         {activeConversation.other_user?.name?.charAt(0)}
                                     </div>
                                     <div>
@@ -220,7 +220,7 @@ export default function Messages() {
                                                 <div className={`max-w-[80%] flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
                                                     <div
                                                         className={`px-4 py-3 rounded-2xl shadow-sm text-sm font-medium leading-relaxed ${isOwn
-                                                            ? 'bg-[var(--color-primary)] text-[var(--color-text)] rounded-br-none'
+                                                            ? 'bg-[var(--color-primary)] text-white rounded-br-none'
                                                             : 'bg-white border border-slate-100 text-slate-800 rounded-bl-none'
                                                             }`}
                                                     >
@@ -261,7 +261,7 @@ export default function Messages() {
                                     <button
                                         type="submit"
                                         disabled={!newMessage.trim() || isSending}
-                                        className="w-12 h-12 bg-[var(--color-primary)] text-[var(--color-text)] rounded-2xl flex items-center justify-center hover:bg-[var(--color-primary-strong)] active:scale-95 transition-all shadow-lg shadow-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-12 h-12 bg-[var(--color-primary)] text-white rounded-2xl flex items-center justify-center hover:bg-[var(--color-primary-strong)] active:scale-95 transition-all shadow-lg shadow-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Send size={20} className="translate-x-0.5 -translate-y-0.5" />
                                     </button>

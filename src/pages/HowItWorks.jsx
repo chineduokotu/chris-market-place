@@ -16,7 +16,7 @@ export default function HowItWorks() {
             Whether you need a job done or want to offer your skills, ChrisHub makes it secure and simple to connect and collaborate.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/services" className="px-8 py-4 bg-[var(--color-primary)] text-[var(--color-text)] font-bold rounded-2xl hover:bg-[var(--color-primary-strong)] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]">
+            <Link to="/services" className="px-8 py-4 bg-[var(--color-primary)] text-white font-bold rounded-2xl hover:bg-[var(--color-primary-strong)] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]">
               Find Services
             </Link>
             <Link to="/register" className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all duration-200 active:scale-[0.98]">
@@ -98,12 +98,12 @@ export default function HowItWorks() {
 
       {/* Trust & Safety */}
       {!user && (
-        <section className="bg-slate-900 text-[var(--color-text)] rounded-[2rem] sm:rounded-[3rem] mx-4 sm:mx-8 p-8 md:p-16 relative overflow-hidden" aria-labelledby="safety-heading">
+        <section className="bg-slate-900 text-white rounded-[2rem] sm:rounded-[3rem] mx-4 sm:mx-8 p-8 md:p-16 relative overflow-hidden" aria-labelledby="safety-heading">
           <div className="absolute top-0 right-0 w-96 h-96 bg-black/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/3"></div>
 
           <div className="relative z-10 max-w-4xl mx-auto text-center">
-            <ShieldCheck size={64} className="text-[var(--color-text)] mx-auto mb-8" aria-hidden />
+            <ShieldCheck size={64} className="text-white mx-auto mb-8" aria-hidden />
             <h2 id="safety-heading" className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Your safety is our priority</h2>
             <p className="text-slate-300 text-lg leading-relaxed mb-10">
               We have implemented robust measures to ensure a secure environment for all users. From verified profiles to secure communication channels, we've got you covered.
