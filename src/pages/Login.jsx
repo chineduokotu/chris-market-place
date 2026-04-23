@@ -107,6 +107,7 @@ export default function Login() {
 
             <button
               type="button"
+              onClick={() => alert('Please register with your email')}
               className="w-full py-4 bg-white border border-slate-200 text-slate-700 font-black rounded-none hover:bg-slate-50 transition-all active:scale-[0.99] flex items-center justify-center gap-3 text-xs uppercase tracking-widest"
             >
               <GoogleIcon size={18} />
