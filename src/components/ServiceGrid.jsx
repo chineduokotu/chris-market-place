@@ -3,7 +3,7 @@ import ServiceCard from './ServiceCard';
 
 function ServiceCardSkeleton() {
   return (
-    <article className="overflow-hidden rounded-[20px] border border-[var(--color-border)] bg-white">
+    <article className="overflow-hidden rounded-none border border-[var(--color-border)] bg-white">
       <div className="aspect-[4/5] animate-pulse bg-slate-100" />
       <div className="space-y-2 p-2.5 sm:p-3">
         <div className="h-4 w-1/2 animate-pulse rounded bg-slate-100" />
@@ -25,7 +25,7 @@ export default function ServiceGrid({
 }) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 12 }).map((_, index) => (
           <ServiceCardSkeleton key={index} />
         ))}
@@ -69,7 +69,7 @@ export default function ServiceGrid({
   return (
     <div>
       {isFetching ? <p className="mb-2 text-xs font-semibold text-slate-500">Updating listings...</p> : null}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {services.map((service) => (
           <ServiceCard key={service.id} service={service} />
         ))}

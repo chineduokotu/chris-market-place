@@ -14,8 +14,11 @@
   --color-success: #0f766e;
   --color-warning: #b45309;
   --color-error: #b91c1c;
-  --radius-card: 16px;
-  --radius-control: 12px;
+  --color-admin-ink: #111827;
+  --color-admin-accent: #f59e0b;
+  --color-admin-mist: #fff8eb;
+  --radius-card: 0px;
+  --radius-control: 0px;
   --shadow-soft: 0 10px 30px rgba(37, 99, 235, 0.12);
   --shadow-soft-hover: 0 18px 42px rgba(37, 99, 235, 0.18);
   --space-1: 4px;

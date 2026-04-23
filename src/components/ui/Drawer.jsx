@@ -31,7 +31,7 @@ export default function Drawer({ isOpen, onClose, title, children, className }) 
       />
       <div
         className={cn(
-          'absolute inset-x-0 bottom-0 max-h-[80vh] overflow-y-auto rounded-t-[24px] border border-[var(--color-border)] bg-white p-5 shadow-2xl',
+          'absolute inset-x-0 bottom-0 max-h-[80vh] overflow-y-auto rounded-none border border-[var(--color-border)] bg-white p-5 shadow-2xl',
           className,
         )}
       >
@@ -40,7 +40,7 @@ export default function Drawer({ isOpen, onClose, title, children, className }) 
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-[var(--color-muted)] hover:bg-slate-100"
+            className="rounded-none p-2 text-[var(--color-muted)] hover:bg-slate-100"
             aria-label="Close drawer"
           >
             <X size={16} />

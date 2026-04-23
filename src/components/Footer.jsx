@@ -11,15 +11,9 @@ export default function Footer() {
       <div className="container-app py-12">
         <div className="grid gap-10 md:grid-cols-3">
           <div className="space-y-4">
-            <Link to="/" className="inline-flex items-center gap-2.5" aria-label="ChrisHub homepage">
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-[10px] text-sm font-extrabold text-[var(--color-text)]"
-                style={{ background: 'var(--color-primary-gradient)' }}
-                aria-hidden
-              >
-                C
-              </div>
-              <span className="text-lg font-extrabold text-[var(--color-text)]">ChrisHub</span>
+            <Link to="/" className="inline-flex items-center gap-2.5" aria-label="SabiLink homepage">
+              <img src="/logo.svg" alt="" className="h-9 w-9 object-contain" />
+              <span className="text-lg font-extrabold text-[var(--color-text)]">SabiLink</span>
             </Link>
             <p className="max-w-sm text-sm text-[var(--color-muted)]">
               A service marketplace designed for speed, trust, and clear communication from first search to final
@@ -62,18 +56,18 @@ export default function Footer() {
             <div className="space-y-3 text-sm text-[var(--color-muted)]">
               <p className="flex items-center gap-2">
                 <MapPin size={15} className="text-[var(--color-primary)]" />
-                Lexington, KY
+                Iriri, Benin City
               </p>
               <p className="flex items-center gap-2">
                 <Phone size={15} className="text-[var(--color-primary)]" />
-                <a href="tel:+18005550123" className="hover:text-[var(--color-primary)]">
-                  +1 (800) 555-0123
+                <a href="tel:+2349079039660" className="hover:text-[var(--color-primary)]">
+                  +2349079039660
                 </a>
               </p>
               <p className="flex items-center gap-2">
                 <Mail size={15} className="text-[var(--color-primary)]" />
-                <a href="mailto:support@chrishub.com" className="hover:text-[var(--color-primary)]">
-                  support@chrishub.com
+                <a href="mailto:comagtech2@gmail.com" className="hover:text-[var(--color-primary)]">
+                  comagtech2@gmail.com
                 </a>
               </p>
             </div>
@@ -81,11 +75,9 @@ export default function Footer() {
         </div>
 
         <p className="mt-10 border-t border-[var(--color-border)] pt-5 text-sm text-slate-500">
-          © {year} ChrisHub. All rights reserved.
+          © {year} SabiLink. All rights reserved.
         </p>
       </div>
     </footer>
   );
 }
-
-

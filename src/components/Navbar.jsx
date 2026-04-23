@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Home, Info, LayoutDashboard, LogOut, MessageSquare, User } from 'lucide-react';
+import { ArrowLeft, Home, Info, LayoutDashboard, LogOut, MessageSquare, Shield, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
@@ -24,7 +24,11 @@ export default function Navbar() {
   }, []);
 
   const navLinks = user
-    ? [...baseNavLinks, { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard }]
+    ? [
+        ...baseNavLinks,
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        ...(user?.is_admin ? [{ name: 'Admin', path: '/admin', icon: Shield }] : []),
+      ]
     : baseNavLinks;
 
   const isActive = (path) => location.pathname === path;
@@ -43,21 +47,15 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-[var(--color-border)] text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-none border border-[var(--color-border)] text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
               aria-label="Go back"
             >
               <ArrowLeft size={18} />
             </button>
 
-            <Link to="/" className="flex items-center gap-2.5" aria-label="ChrisHub homepage">
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-[10px] text-sm font-extrabold text-white"
-                style={{ background: 'var(--color-primary-gradient)' }}
-                aria-hidden
-              >
-                C
-              </div>
-              <span className="text-lg font-extrabold text-[var(--color-text)]">ChrisHub</span>
+            <Link to="/" className="flex items-center gap-2.5" aria-label="SabiLink homepage">
+              <img src="/logo.svg" alt="SabiLink Logo" className="h-9 w-9 object-contain" />
+              <span className="text-lg font-extrabold text-[var(--color-text)]">SabiLink</span>
             </Link>
 
             <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">
@@ -65,7 +63,7 @@ export default function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`inline-flex items-center gap-2 rounded-[10px] px-3 py-2 text-sm font-semibold transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm font-semibold transition-colors ${
                     isActive(link.path)
                       ? 'bg-[var(--color-primary-soft)] text-[var(--color-primary)]'
                       : 'text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]'
@@ -84,7 +82,7 @@ export default function Navbar() {
               <>
                 <Link
                   to="/messages"
-                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-[10px] text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
+                  className="relative inline-flex h-10 w-10 items-center justify-center rounded-none text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
                   aria-label="Open messages"
                 >
                   <MessageSquare size={18} />
@@ -96,7 +94,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/profile"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-none text-[var(--color-muted)] hover:bg-slate-100 hover:text-[var(--color-text)]"
                   aria-label="Open profile"
                 >
                   <User size={18} />

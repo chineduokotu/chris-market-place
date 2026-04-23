@@ -1,0 +1,33 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sabilink_grad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0a2e5c"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="10" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main Icon Shape -->
+  <g filter="url(#shadow)">
+    <!-- Top Link -->
+    <path d="M180 140C180 128.954 188.954 120 200 120H340C384.183 120 420 155.817 420 200V208C420 252.183 384.183 288 340 288H240" 
+          stroke="url(#sabilink_grad)" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Bottom Link -->
+    <path d="M332 372C332 383.046 323.046 392 312 392H172C127.817 392 92 356.183 92 312V304C92 259.817 127.817 224 172 224H272" 
+          stroke="url(#sabilink_grad)" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+          
+    <!-- Decorative Connection Node -->
+    <circle cx="256" cy="256" r="32" fill="url(#sabilink_grad)" />
+  </g>
+</svg>

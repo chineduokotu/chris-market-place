@@ -10,15 +10,50 @@ export function AuthProvider({ children }) {
     const storedUser = localStorage.getItem('user');
     return (token && storedUser) ? JSON.parse(storedUser) : null;
   });
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('token')));
 
   useEffect(() => {
-    // State initialization moved to useState
+    const token = localStorage.getItem('token');
 
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
+    let cancelled = false;
 
+    const bootstrapAuth = async () => {
+      try {
+        updateEchoAuth(token);
+        const response = await api.get('/user');
 
+        if (cancelled) {
+          return;
+        }
 
+        localStorage.setItem('user', JSON.stringify(response.data));
+        setUser(response.data);
+      } catch {
+        if (cancelled) {
+          return;
+        }
+
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        updateEchoAuth(null);
+        setUser(null);
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    bootstrapAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -67,8 +102,15 @@ export function AuthProvider({ children }) {
     setUser(updatedUser);
   };
 
+  const refreshUser = async () => {
+    const response = await api.get('/user');
+    localStorage.setItem('user', JSON.stringify(response.data));
+    setUser(response.data);
+    return response.data;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRole, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, switchRole, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

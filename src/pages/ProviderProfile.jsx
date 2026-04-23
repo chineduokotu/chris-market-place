@@ -30,7 +30,7 @@ export default function ProviderProfile() {
   useEffect(() => {
     setMeta({
       title: `${providerName} | Provider Profile`,
-      description: `View ${providerName}'s services and availability on ChrisHub.`,
+      description: `View ${providerName}'s services and availability on SabiLink.`,
       url: window.location.href,
     });
 

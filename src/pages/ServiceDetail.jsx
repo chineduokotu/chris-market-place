@@ -46,7 +46,7 @@ export default function ServiceDetail() {
     if (!service) return;
 
     setMeta({
-      title: `${service.title} | ChrisHub`,
+      title: `${service.title} | SabiLink`,
       description: service.description?.slice(0, 140) || 'Explore service details and request a booking.',
       url: window.location.href,
       image: service.image || undefined,
@@ -282,4 +282,3 @@ export default function ServiceDetail() {
     </PageContainer>
   );
 }
-

@@ -10,13 +10,17 @@ export default function HowItWorks() {
       <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
-            How <span className="text-black">ChrisHub</span> Works
+            How <span className="text-black">SabiLink</span> Works
           </h1>
           <p className="text-lg text-slate-600 leading-relaxed mb-10">
-            Whether you need a job done or want to offer your skills, ChrisHub makes it secure and simple to connect and collaborate.
+            Whether you need a job done or want to offer your skills, SabiLink makes it secure and simple to connect and collaborate.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/services" className="px-8 py-4 bg-[var(--color-primary)] text-white font-bold rounded-2xl hover:bg-[var(--color-primary-strong)] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]">
+            <Link
+              to="/services"
+              className="px-8 py-4 bg-[var(--color-primary)] font-bold rounded-2xl hover:bg-[var(--color-primary-strong)] shadow-lg shadow-slate-200/50 transition-all duration-200 active:scale-[0.98]"
+              style={{ color: '#ffffff' }}
+            >
               Find Services
             </Link>
             <Link to="/register" className="px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all duration-200 active:scale-[0.98]">
@@ -104,11 +108,21 @@ export default function HowItWorks() {
 
           <div className="relative z-10 max-w-4xl mx-auto text-center">
             <ShieldCheck size={64} className="text-white mx-auto mb-8" aria-hidden />
-            <h2 id="safety-heading" className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">Your safety is our priority</h2>
-            <p className="text-slate-300 text-lg leading-relaxed mb-10">
+            <h2
+              id="safety-heading"
+              className="text-3xl md:text-4xl font-bold mb-6 tracking-tight"
+              style={{ color: '#ffffff' }}
+            >
+              Your safety is our priority
+            </h2>
+            <p className="text-lg leading-relaxed mb-10" style={{ color: '#cbd5e1' }}>
               We have implemented robust measures to ensure a secure environment for all users. From verified profiles to secure communication channels, we've got you covered.
             </p>
-            <Link to="/register" className="inline-block px-8 py-4 bg-white text-black font-bold rounded-2xl hover:bg-slate-50 transition-colors duration-200 active:scale-[0.98]">
+            <Link
+              to="/register"
+              className="inline-block px-8 py-4 bg-white font-bold rounded-2xl hover:bg-slate-50 transition-colors duration-200 active:scale-[0.98]"
+              style={{ color: '#0f172a' }}
+            >
               Join Community Today
             </Link>
           </div>
