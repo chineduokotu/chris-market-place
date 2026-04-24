@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import BookingCard from '../components/BookingCard';
 import { groupCategories } from '../lib/category';
+import imageCompression from 'browser-image-compression';
 import {
   User, Phone, MessageSquare, Save, CheckCircle, AlertCircle, Loader2,
   Settings, Briefcase, Plus, X, LayoutDashboard, Calendar, PlusCircle,
@@ -146,7 +147,8 @@ export default function Profile() {
 
   const updateServiceMutation = useMutation({
     mutationFn: async ({ serviceId, data }) => {
-      return api.put(`/services/${serviceId}`, data, {
+      data.append('_method', 'PUT');
+      return api.post(`/services/${serviceId}`, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
     },
@@ -173,17 +175,31 @@ export default function Profile() {
     },
   });
 
-  const handleProfileImageChange = (e) => {
+  const handleProfileImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setProfileImagePreview(reader.result);
-      reader.readAsDataURL(file);
+      try {
+        const options = {
+          maxSizeMB: 1, // Compress to max 1MB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+        
+        // Compress the image before preview/upload
+        const compressedFile = await imageCompression(file, options);
 
-      // Immediately upload
-      const formDataObj = new FormData();
-      formDataObj.append('profile_photo', file);
-      profileMutation.mutate(formDataObj);
+        const reader = new FileReader();
+        reader.onloadend = () => setProfileImagePreview(reader.result);
+        reader.readAsDataURL(compressedFile);
+
+        // Immediately upload
+        const formDataObj = new FormData();
+        formDataObj.append('profile_photo', compressedFile);
+        profileMutation.mutate(formDataObj);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        alert('Failed to compress image. Please try a smaller file.');
+      }
     }
   };
 
@@ -260,13 +276,26 @@ export default function Profile() {
     setImagePreview(null);
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
+      try {
+        const options = {
+          maxSizeMB: 1.5, // Compress service image to max 1.5MB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        };
+        
+        const compressedFile = await imageCompression(file, options);
+        setImageFile(compressedFile);
+        
+        const reader = new FileReader();
+        reader.onloadend = () => setImagePreview(reader.result);
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        alert('Failed to compress image. Please try a smaller file.');
+      }
     }
   };
 
